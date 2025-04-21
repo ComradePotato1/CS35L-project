@@ -20,9 +20,6 @@ const Login = () => {
             login(response.data.user); 
             navigate('/');
             
-
-            
-
         } catch (error) {
             alert(error.response?.data?.error || 'Login failed');
         }

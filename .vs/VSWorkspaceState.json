@@ -6,9 +6,10 @@
     "\\react\\src",
     "\\react\\src\\components",
     "\\react\\src\\components\\auth",
+    "\\react\\src\\components\\history",
     "\\react\\src\\components\\home",
     "\\react\\src\\components\\navbar"
   ],
-  "SelectedNode": "\\express",
+  "SelectedNode": "\\react\\src\\components\\home\\home.js",
   "PreviewInSolutionExplorer": false
 }
