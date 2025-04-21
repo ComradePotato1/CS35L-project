@@ -2,8 +2,12 @@ import logo from './logo.svg';
 import './App.css';
 
 import Login from "./components/auth/login.js"
+import Register from "./components/auth/register.js"
 import Navbar from "./components/navbar/navbar.js"
-import Home  from "./components/home/home.js"
+import Home from "./components/home/home.js"
+import History from "./components/history/history.js"
+import ProtectedRoute from "./components/auth/ProtectedRoute.js"
+import { Auth } from "./components/auth/auth.js"
 
 import { useEffect, useState } from "react";
 
@@ -17,20 +21,21 @@ import {
 
 
 function App() {
+    const [user, setUser] = useState(null);
 
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-  return (
+    return (
+      <Auth>
       <div className="App">
     <Navbar />
           <Routes>
-              <Route path="/" element={<Login onLogin={() => setIsAuthenticated(true)} />} />
-              <Route path="/login" element={<Home />} />
-              <Route
-                  path="/home"
-                  element={isAuthenticated ? <Home /> : <Navigate to="/" />}
-              />
+              <Route path="/register" element={<Register /> } />
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<ProtectedRoute> <Home /> </ProtectedRoute>} />
+              <Route path="/history" element={ <ProtectedRoute> <History /> </ProtectedRoute>}/>
+              
           </Routes>
-    </div>
+            </div>
+        </Auth>
   );
 }
 

@@ -24,6 +24,7 @@ const Navbar = () => {
             <div className="links">
                 {/* Always visible links */}
                 <a href="/" className="home">Home</a>
+                <a href="/history" className="home">History</a>
                 <a href="/login" className="login">Login</a>
 
                 {/* Conditional links based on login state */}
