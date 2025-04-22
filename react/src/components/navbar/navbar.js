@@ -1,19 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, Link } from 'react-router-dom';
-// import { AuthProvider, useAuth } from "../../contexts/AuthContext.js";
+import { AuthContext } from '../auth/auth.js';
 
 import "./navbar.css";
 
 const Navbar = () => {
-    //const navigate = useNavigate();
-  //  const { userLoggedIn } = useAuth(); // Get the current userLoggedIn
+    const navigate = useNavigate();
+    const { user } = useContext(AuthContext);
 
-    // Check login state from localStorage on component mount
 
-    // Handle logout function
-   // const handleLogout = () => {
-    //    navigate("/login"); // Redirect to login page
-   // };
 
     return (
         <nav className="nav">
@@ -25,8 +20,13 @@ const Navbar = () => {
                 {/* Always visible links */}
                 <a href="/" className="home">Home</a>
                 <a href="/history" className="home">History</a>
-                <a href="/login" className="login">Login</a>
-
+                
+                {user ? (
+                    <a href="/logout" className="login">Log out</a>
+                ) : (
+                    <a href="/login" className="login">Login</a>
+                )
+                }
                 {/* Conditional links based on login state */}
                 {/*userLoggedIn ? (
                     <>

@@ -7,6 +7,7 @@ import Navbar from "./components/navbar/navbar.js"
 import Home from "./components/home/home.js"
 import History from "./components/history/history.js"
 import ProtectedRoute from "./components/auth/ProtectedRoute.js"
+import Logout from "./components/auth/logout.js"
 import { Auth } from "./components/auth/auth.js"
 
 import { useEffect, useState } from "react";
@@ -30,6 +31,7 @@ function App() {
           <Routes>
               <Route path="/register" element={<Register /> } />
               <Route path="/login" element={<Login />} />
+                    <Route path="/logout" element={<Logout />} />
               <Route path="/" element={<ProtectedRoute> <Home /> </ProtectedRoute>} />
               <Route path="/history" element={ <ProtectedRoute> <History /> </ProtectedRoute>}/>
               

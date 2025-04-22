@@ -32,7 +32,8 @@ app.get('/test', async (req, res) => {
 app.post('/register', async (req, res) => {
     try {
         const { username, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
+        //const hashedPassword = await bcrypt.hash(password, 10);
+        //suspend hashing passwords for simplicity?
 
         const [rows] = await pool.execute(
             'SELECT * FROM users WHERE username = ?',
@@ -45,7 +46,8 @@ app.post('/register', async (req, res) => {
 
         const [result] = await pool.execute(
             'INSERT INTO users (username, password) VALUES (?, ?)',
-            [username, hashedPassword]
+            [username, password]
+            //[username, hashedPassword]
         );
 
         res.status(200).json({ message: 'User created' });
@@ -67,7 +69,9 @@ app.post('/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        const match = await bcrypt.compare(password, rows[0].password);
+        const match = (password == rows[0].password);
+        //const match = await bcrypt.compare(password, rows[0].password);
+        //suspend hashing
         if (!match) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }

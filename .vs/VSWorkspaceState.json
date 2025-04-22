@@ -3,6 +3,8 @@
     "",
     "\\express",
     "\\react",
+    "\\react\\public",
+    "\\react\\public\\images",
     "\\react\\src",
     "\\react\\src\\components",
     "\\react\\src\\components\\auth",
@@ -10,6 +12,6 @@
     "\\react\\src\\components\\home",
     "\\react\\src\\components\\navbar"
   ],
-  "SelectedNode": "\\react\\src\\components\\home\\home.js",
+  "SelectedNode": "\\react\\src\\components\\auth\\login.css",
   "PreviewInSolutionExplorer": false
 }

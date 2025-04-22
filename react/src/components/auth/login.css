@@ -1,0 +1,71 @@
+.login-page {
+    height: 90vh;
+}
+
+.login-text {
+    font-size: 5em;
+    margin: 0vh;
+    color: #eeeeee;
+    font-weight: bold;
+}
+
+
+.login-input {
+    font-size: 3vh;
+    height: 8vh;
+    width: 35%;
+    margin-top: 5vh;
+    margin-bottom: 1vh;
+    border-radius: 50px;
+    text-indent: 15px;
+    border-width: 0;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 8);
+    opacity: 90%;
+}
+
+.login-input-invalid {
+    border-width: 3px;
+    border-color: red;
+    font-size: 3vh;
+    height: 8vh;
+    width: 35%;
+    margin-top: 5vh;
+    margin-bottom: 1vh;
+    border-radius: 50px;
+    text-indent: 15px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 8);
+    opacity: 90%;
+}
+
+.login-button {
+    margin-top: 5vh;
+    height: 8vh;
+    width: 35%;
+    border-radius: 50px;
+    margin-bottom: 2vh;
+    font-size: 3vh;
+    background-color: #4499cc;
+    color: white;
+    font-weight: bold;
+    border-width: 0;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 5);
+}
+
+.login-button:hover {
+    filter: brightness(80%);
+}
+
+.login-background {
+    background-image: url('../../../public/images/login-page-bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+@media (max-width: 800px) {
+    .login-input {
+        width: 80%;
+    }
+    .login-button {
+        width: 80%;
+    }
+}
