@@ -4,7 +4,6 @@ const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const axios = require('axios');
 
 const app = express();
 app.use(express.json());
@@ -19,13 +18,12 @@ const pool = mysql.createPool({
     waitForConnections: true,
 });
 
-
-
 pool.query("CREATE DATABASE IF NOT EXISTS project ");
 pool.query("USE project");
-pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255) ) ");
+pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), weight SMALLINT(15), height SMALLINT(15), dailyGoal BOOLEAN, weeklyGoal BOOLEAN )");
 pool.query("CREATE TABLE IF NOT EXISTS log ( log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME(0), end TIME(0), post VARCHAR(255))");
 pool.query("CREATE TABLE IF NOT EXISTS react ( log_id INT, username VARCHAR(255) )");
+pool.query("CREATE TABLE IF NOT EXISTS follow ( follower VARCHAR(255) , followee VARCHAR(255) )");
 
 app.get('/test', async (req, res) => {
     res.status(200).json({ message: 'test success' });
@@ -80,6 +78,62 @@ app.post('/login', async (req, res) => {
         const user = rows[0].username;
 
         res.json({ message: 'Login successful', user, });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/change-password', async (req, res) => {
+    try {
+        const { username, password, new_password } = req.body;
+        const [rows] = await pool.execute(
+            'SELECT * FROM users WHERE username = ? AND password = ?',
+            [username, password]
+        );
+
+        if (rows.length === 0) {
+            return res.status(500).json({ message: 'wrong password' });
+        }
+
+        await pool.execute(
+            'UPDATE users SET password = ? WHERE username = ?',
+            [new_password, username]
+
+        )
+        res.json({ message: 'Change password successful' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/update-profile', async (req, res) => {
+    try {
+        const { username, name, weight, height, dailyGoal, weeklyGoal } = req.body;
+        await pool.execute(
+            'UPDATE users SET name = ?, weight = ?, height = ?, dailyGoal = ?, weeklyGoal = ? WHERE username = ?',
+            [name, weight, height, dailyGoal, weeklyGoal, username]
+        );
+
+        res.json({ message: 'Update successful' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/get-userinfo', async (req, res) => {
+    try {
+        const { username } = req.body;
+
+        const [rows] = await pool.execute(
+            'SELECT * FROM users WHERE username = ?',
+            [username]
+        );
+
+        if (rows.length === 0) {
+            return res.status(401).json({ error: 'Username not found' });
+        }
+
+        res.status(200).json({ rows });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -171,6 +225,70 @@ app.post('/get-react', async (req, res) => {
         let result = [];
         for (let i = 0; i < rows.length; i++) {
             result.push(rows[i].username);
+        }
+
+        res.status(200).json({ result });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/follow', async (req, res) => {
+    try {
+        const { follower, followee } = req.body;
+
+
+        const [result] = await pool.execute(
+            'insert into follow (follower, followee) values (?, ?)',
+            [follower, followee]
+        );
+
+        res.status(200).json({ message: 'Follow successful' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/get-follower', async (req, res) => {
+    try {
+        const { followee } = req.body;
+
+        const [rows] = await pool.execute(
+            'SELECT * FROM follow WHERE followee = ?',
+            [followee]
+        );
+
+        if (rows.length === 0) {
+            return res.status(401).json({ error: 'Username not found' });
+        }
+
+        let result = [];
+        for (let i = 0; i < rows.length; i++) {
+            result.push(rows[i].follower);
+        }
+
+        res.status(200).json({ result });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/get-followee', async (req, res) => {
+    try {
+        const { follower } = req.body;
+
+        const [rows] = await pool.execute(
+            'SELECT * FROM follow WHERE follower = ?',
+            [follower]
+        );
+
+        if (rows.length === 0) {
+            return res.status(401).json({ error: 'Username not found' });
+        }
+
+        let result = [];
+        for (let i = 0; i < rows.length; i++) {
+            result.push(rows[i].followee);
         }
 
         res.status(200).json({ result });
