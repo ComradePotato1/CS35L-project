@@ -12,6 +12,19 @@ const Home = () => {
   const [end, setEnd] = useState('');
   const [post, setPost] = useState('');
   const [error, setError] = useState('');
+  const [icon, setIcon] = useState('/images/icons/workout.svg');
+
+    function changeIcon(e) {
+        if (!e.indexOf("run")) {
+            setIcon('/images/icons/running.svg');
+        } else if (!e.indexOf("lift") || !e.indexOf("weight")) {
+            setIcon('/images/icons/dumbbell.svg');
+        } else if (!e.indexOf("swim")) {
+            setIcon('/images/icons/swimming.svg');
+        } else {
+            setIcon('/images/icons/workout.svg');
+        }
+    }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,7 +61,8 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      <h2>Welcome back, {user}!</h2>
+          <h2>Welcome back, {user}!</h2>
+          <img src={icon} alt="icon" className="home-icon"></img>
 
       <section className="add-workout">
         <h3>Add a Workout</h3>
@@ -58,7 +72,7 @@ const Home = () => {
             <input
               type="text"
               value={activity}
-              onChange={e => setActivity(e.target.value)}
+                onChange={e => { setActivity(e.target.value); changeIcon(e.target.value) }}
               placeholder="Exercise"
               required
             />

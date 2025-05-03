@@ -22,21 +22,11 @@ const Navbar = () => {
                 <a href="/history" className="home">History</a>
                 
                 {user ? (
-                    <a href="/logout" className="login">Log out</a>
+                    <a href="/profile" className="login">Profile</a>
                 ) : (
                     <a href="/login" className="login">Login</a>
                 )
                 }
-                {/* Conditional links based on login state */}
-                {/*userLoggedIn ? (
-                    <>
-                        <a href="/profile" className="profile">Profile</a>
-                    </>
-                ) : (
-                    <>
-                        <a href="/login" className="login">Login</a>
-                    </>
-                )*/}
             </div>
         </nav>
     );
