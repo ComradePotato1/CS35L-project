@@ -10,6 +10,15 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+const connect = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    waitForConnections: true,
+});
+
+connect.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`);
+
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -18,8 +27,7 @@ const pool = mysql.createPool({
     waitForConnections: true,
 });
 
-pool.query("CREATE DATABASE IF NOT EXISTS project ");
-pool.query("USE project");
+pool.query(`USE ${process.env.DB_NAME}`);
 pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), weight SMALLINT(15), height SMALLINT(15), dailyGoal BOOLEAN, weeklyGoal BOOLEAN )");
 pool.query("CREATE TABLE IF NOT EXISTS log ( log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME(0), end TIME(0), post VARCHAR(255))");
 pool.query("CREATE TABLE IF NOT EXISTS react ( log_id INT, username VARCHAR(255) )");
