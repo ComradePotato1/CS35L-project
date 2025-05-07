@@ -35,7 +35,7 @@ const Home = () => {
     }
 
     try {
-      await axios.post('http://localhost:5000/log', {
+      await axios.post('http://localhost:5001/log', {
         username: user,
         activity,
         day,

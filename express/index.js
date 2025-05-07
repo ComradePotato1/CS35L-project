@@ -297,5 +297,24 @@ app.post('/get-followee', async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 5000;
+app.post('/update-log', async (req, res) => {
+    try {
+        const { log_id, activity, post, day, start, end } = req.body;
+
+        await pool.executes(
+            `UPDATE log
+            SET activity = ?, post = ?, day = ?, start = ?, end = ?
+            WHERE log_id = ?`,
+            [activity, post, day, start, end, log_id]
+        );
+        res.status(200).json({ message: 'Log updated successfully' });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Failed to update log',
+            details: error.message
+        });
+    }
+});
+
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
