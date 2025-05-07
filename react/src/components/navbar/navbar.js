@@ -1,26 +1,31 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../auth/auth.js';
 
 import "./navbar.css";
 
 const Navbar = () => {
-    const navigate = useNavigate();
     const { user } = useContext(AuthContext);
-
+    const location = useLocation();
+    const excludedRoutes = ['/'];
+    const hideNavbar = excludedRoutes.includes(location.pathname);
 
 
     return (
+        !hideNavbar && (
         <nav className="nav">
-            <a href="/" className="sitename">
-                {/* Logo or website name */}
+            <a href="/home" className="sitename">
                 <img src="" alt="logo" className="logo-image"/>
             </a>
             <div className="links">
-                {/* Always visible links */}
-                <a href="/" className="home">Home</a>
-                <a href="/history" className="home">History</a>
+                <a href="/home" className="home">Home</a>
                 
+
+                {user ? (
+                    <a href="/history" className="home">History</a>
+                ) : (<span />)
+                }
+
                 {user ? (
                     <a href="/profile" className="login">Profile</a>
                 ) : (
@@ -28,7 +33,8 @@ const Navbar = () => {
                 )
                 }
             </div>
-        </nav>
+            </nav>
+        )
     );
 };
 

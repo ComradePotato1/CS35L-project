@@ -1,16 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\express",
     "\\react",
-    "\\react\\public",
     "\\react\\src",
     "\\react\\src\\components",
     "\\react\\src\\components\\auth",
-    "\\react\\src\\components\\history",
+    "\\react\\src\\components\\cover",
     "\\react\\src\\components\\home",
-    "\\react\\src\\components\\navbar"
+    "\\react\\src\\components\\navbar",
+    "\\react\\src\\components\\profile",
+    "\\react\\src\\services"
   ],
-  "SelectedNode": "\\express\\package.json",
+  "SelectedNode": "\\react\\src\\App.css",
   "PreviewInSolutionExplorer": false
 }

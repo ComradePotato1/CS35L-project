@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2/promise');
-const bcrypt = require('bcrypt');
+//const bcrypt = require('bcrypt');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 

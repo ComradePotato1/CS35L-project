@@ -9,6 +9,7 @@ import History from "./components/history/history.jsx"
 import ProtectedRoute from "./components/auth/ProtectedRoute.js"
 import Logout from "./components/auth/logout.js"
 import Profile from "./components/profile/profile.js"
+import Cover from "./components/cover/cover.js"
 import { Auth } from "./components/auth/auth.js"
 
 import { useEffect, useState } from "react";
@@ -30,10 +31,11 @@ function App() {
       <div className="App">
     <Navbar />
           <Routes>
+              <Route path='/' element={<Cover /> } />
               <Route path="/register" element={<Register /> } />
               <Route path="/login" element={<Login />} />
               <Route path="/logout" element={<Logout />} />
-              <Route path="/" element={<ProtectedRoute> <Home /> </ProtectedRoute>} />
+              <Route path="/home" element={<ProtectedRoute> <Home /> </ProtectedRoute>} />
               <Route path="/history" element={ <ProtectedRoute> <History /> </ProtectedRoute>}/>
               <Route path="/profile" element={<ProtectedRoute> <Profile /> </ProtectedRoute> } />
           </Routes>

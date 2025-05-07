@@ -22,7 +22,7 @@ const Login = () => {
             });
             //alert(response.data.message)
             login(response.data.user); 
-            navigate('/');
+            navigate('/home');
             
         } catch (error) {
             setInputbox("login-input-invalid");
@@ -59,9 +59,11 @@ const Login = () => {
                         className={inputbox }
                         />
                     <br></br>
-                    <button type="submit" className="login-button">LOGIN</button>
+                    <button type="submit" className="login-button">Login</button>
+                    <br />
+                    <button className="login-button" onClick={handleRegister} >New to the site? Register</button>
                 </form>
-                <button className="login-button" onClick={handleRegister}>New to the site? Register</button>
+                
             </div>
         </div> 
     );

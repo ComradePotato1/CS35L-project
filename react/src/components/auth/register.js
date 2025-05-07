@@ -46,7 +46,7 @@ const Register = () => {
                         className="login-input"
                     />
                     <br></br>
-                    <button type="submit" className="login-button">REGISTER</button>
+                    <button type="submit" className="login-button">Register</button>
                 </form>
 
             </div>
