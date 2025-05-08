@@ -27,6 +27,11 @@ const Navbar = () => {
                 }
 
                 {user ? (
+                    <a href="/social" className="home">Social</a>
+                ) : (<span />)
+                }
+
+                {user ? (
                     <a href="/profile" className="login">Profile</a>
                 ) : (
                     <a href="/login" className="login">Login</a>

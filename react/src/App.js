@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute.js"
 import Logout from "./components/auth/logout.js"
 import Profile from "./components/profile/profile.js"
 import Cover from "./components/cover/cover.js"
+import Social from "./components/social/social.js"
 import { Auth } from "./components/auth/auth.js"
 
 import { useEffect, useState } from "react";
@@ -38,6 +39,7 @@ function App() {
               <Route path="/home" element={<ProtectedRoute> <Home /> </ProtectedRoute>} />
               <Route path="/history" element={ <ProtectedRoute> <History /> </ProtectedRoute>}/>
               <Route path="/profile" element={<ProtectedRoute> <Profile /> </ProtectedRoute> } />
+              <Route path="/social" element={<ProtectedRoute> <Social /> </ProtectedRoute>} />
           </Routes>
             </div>
         </Auth>

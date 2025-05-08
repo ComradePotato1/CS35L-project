@@ -1,16 +1,16 @@
 {
   "ExpandedNodes": [
     "",
+    "\\express",
     "\\react",
     "\\react\\src",
     "\\react\\src\\components",
-    "\\react\\src\\components\\auth",
-    "\\react\\src\\components\\cover",
+    "\\react\\src\\components\\history",
     "\\react\\src\\components\\home",
     "\\react\\src\\components\\navbar",
     "\\react\\src\\components\\profile",
-    "\\react\\src\\services"
+    "\\react\\src\\components\\social"
   ],
-  "SelectedNode": "\\react\\src\\App.css",
+  "SelectedNode": "\\express\\index.js",
   "PreviewInSolutionExplorer": false
 }

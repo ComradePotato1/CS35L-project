@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
+import { AuthContext } from './auth.js';
 
 import './login.css'
 import '../../App.css'
@@ -9,6 +10,15 @@ const Register = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const { user } = useContext(AuthContext);
+
+    useEffect(() => {
+        if (user) {
+            navigate('/home');
+        }
+    }, [navigate]);
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './auth.js';
@@ -12,6 +12,14 @@ const Login = () => {
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
     const [inputbox, setInputbox] = useState("login-input")
+    const { user } = useContext(AuthContext);
+
+    useEffect(() => {
+        if (user) {
+            navigate('/home');
+        }
+    }, [navigate]);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -34,7 +42,8 @@ const Login = () => {
     const handleRegister = () => {
         navigate('/register');
     }
-   
+
+    
     return (
         <div className="login-background">
             <div className="login-page">

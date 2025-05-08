@@ -305,6 +305,41 @@ app.post('/get-followee', async (req, res) => {
     }
 });
 
+app.post('/get-user-rec', async (req, res) => {
+    try {
+        const { username } = req.body;
+
+        const [followees] = await pool.execute(
+            'SELECT * FROM follow WHERE follower = ?',
+            [username]
+        );
+
+        let exclude = [];
+        for (let i = 0; i < followees.length; i++) {
+            exclude.push(followees[i].followee);
+        }
+
+        const [users] = await pool.execute(
+            'SELECT * FROM users WHERE username != ?',
+            [username]
+        );
+
+        let result = [];
+        //change length as necessary, 2 for testing
+        //implement better randomization
+        for (let i = 0; result.length < Math.min(2, users.length-exclude.length); i = Math.floor(Math.random() * users.length)) {
+            if (exclude.indexOf(users[i].username) == -1) {
+                result.push({ username: users[i].username, name: users[i].name });
+            }
+        }
+        
+        res.status(200).json({ result });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 app.post('/update-log', async (req, res) => {
     try {
         const { log_id, activity, post, day, start, end } = req.body;
@@ -323,6 +358,7 @@ app.post('/update-log', async (req, res) => {
         });
     }
 });
+
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
