@@ -22,13 +22,23 @@ const Home = () => {
 
   function changeIcon(text) {
     const lower = text.toLowerCase();
-    if (lower.includes("run")) {
+    if (lower.includes("run") || lower.includes('ran')) {
       setIcon('/images/icons/running.svg');
     } else if (lower.includes("lift") || lower.includes("weight")) {
       setIcon('/images/icons/dumbbell.svg');
-    } else if (lower.includes("swim")) {
+    } else if (lower.includes("swim") || lower.includes("swam")) {
       setIcon('/images/icons/swimming.svg');
-    } else {
+    } else if (lower.includes('bike') || lower.includes('biking')) {
+      setIcon('/images/icons/bike.svg');
+    } else if (lower.includes('box')) {
+      setIcon('/images/icons/boxing.svg');
+    } else if (lower.includes('yoga')) {
+      setIcon('/images/icons/yoga.svg')
+    } else if (lower.includes('pilate')) {
+        setIcon('/images/icons/pilates.svg')
+    }
+
+    else {
       setIcon('/images/icons/workout.svg');
     }
   }

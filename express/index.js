@@ -166,10 +166,17 @@ app.post('/log', async (req, res) => {
 app.post('/get-log', async (req, res) => {
     try {
         const { username, range_start, range_end } = req.body;
-        const [rows] = await pool.execute(
-            'SELECT * FROM log WHERE username = ? ORDER BY timestamp DESC',
-            [username]
-        );
+        let rows;
+        if (username == 'admin') {
+            [rows] = await pool.execute(
+                'SELECT * FROM log ORDER BY timestamp DESC',
+            );
+        } else {
+            [rows] = await pool.execute(
+                'SELECT * FROM log WHERE username = ? ORDER BY timestamp DESC',
+                [username]
+            );
+        }
 
         if (rows.length === 0) {
             return res.status(401).json({ error: 'Username not found' });
@@ -325,10 +332,12 @@ app.post('/get-user-rec', async (req, res) => {
         );
 
         let result = [];
+        let chosen = [];
         //change length as necessary, 2 for testing
         //implement better randomization
-        for (let i = 0; result.length < Math.min(2, users.length-exclude.length); i = Math.floor(Math.random() * users.length)) {
-            if (exclude.indexOf(users[i].username) == -1) {
+        for (let i = Math.floor(Math.random() * users.length); result.length < Math.min(2, users.length-exclude.length); i = Math.floor(Math.random() * users.length)) {
+            if (i != chosen.slice(-1)[0] && exclude.indexOf(users[i].username) == -1) {
+                chosen.push(i);
                 result.push({ username: users[i].username, name: users[i].name });
             }
         }
