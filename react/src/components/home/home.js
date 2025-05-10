@@ -85,13 +85,13 @@ const Home = () => {
   }
 
   return (
-    <div className="home-container">
+    <div className="page">
       <h2>Welcome back, {user}!</h2>
-      <img src={icon} alt="icon" className="home-icon" />
+      <img src={icon} alt="icon" className="hicon" />
 
-      <section className="add-workout">
+      <section className="workout">
         <h3>Add a Workout</h3>
-        <form onSubmit={handleSubmit} className="workout-form">
+        <form onSubmit={handleSubmit} className="form">
           <div>
             <label>Activity:</label>
             <input
@@ -144,7 +144,7 @@ const Home = () => {
             />
           </div>
 
-          {error && <p className="error-message">{error}</p>}
+          {error && <p className="errors">{error}</p>}
 
           <button type="submit">Submit Workout</button>
         </form>

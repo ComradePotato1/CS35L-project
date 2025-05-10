@@ -21,14 +21,17 @@ const Profile = () => {
 
     async function fetchProfile() {
       try {
+        
+        
         const res = await axios.post('http://localhost:5001/get-userinfo', {
           username: user
         });
-        // the server returns { rows: [ { user_id, username, name, weight, height, dailyGoal, weeklyGoal } ] }
+
+        
         setInfo(res.data.rows[0]);
       } catch (err) {
-        console.error('Failed to load profile:', err.response?.data || err);
-        setError('Could not load profile data.');
+        console.error('Cannot load profile:', err.response?.data || err);
+        setError('Cannot load Profile');
       }
     }
 
@@ -40,41 +43,42 @@ const Profile = () => {
   }
 
   return (
-    <div className="profile-container">
+    <div className="container">
       <h2>Your Profile</h2>
 
-      {error && <p className="error-message">{error}</p>}
+      {error && <p className="errors">{error}</p>}
 
-      <div className="profile-field">
-        <span className="field-label">Username:</span>
-        <span className="field-value">{info.username}</span>
+      <div className="profile">
+
+        <span className="tag">Username:</span>
+        <span className="val">{info.username}</span>
       </div>
 
-      <div className="profile-field">
-        <span className="field-label">Name:</span>
-        <span className="field-value">{info.name || '—'}</span>
+      <div className="profile">
+        <span className="tag">Name (default username):</span>
+        <span className="val">{info.name ||  info.username}</span>
       </div>
 
-      <div className="profile-field">
-        <span className="field-label">Weight:</span>
-        <span className="field-value">{info.weight || '—'} lbs</span>
+      <div className="profile">
+        <span className="tag">Weight:</span>
+        <span className="val">{info.weight || '—'} lbs</span>
       </div>
 
-      <div className="profile-field">
-        <span className="field-label">Height:</span>
-        <span className="field-value">{info.height || '—'} in</span>
+      <div className="profile">
+        <span className="tag">Height:</span>
+        <span className="val">{info.height || '—'} in</span>
       </div>
 
-      <div className="profile-field">
-        <span className="field-label">Daily Goal:</span>
-        <span className="field-value">
+      <div className="profile">
+        <span className="tag">Daily Goal Reached:</span>
+        <span className="val">
           {info.dailyGoal ? 'Yes' : 'No'}
         </span>
       </div>
 
-      <div className="profile-field">
-        <span className="field-label">Weekly Goal:</span>
-        <span className="field-value">
+      <div className="profile">
+        <span className="tag">Weekly Goal Reached:</span>
+        <span className="val">
           {info.weeklyGoal ? 'Yes' : 'No'}
         </span>
       </div>
