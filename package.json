@@ -8,6 +8,7 @@
     "start": "concurrently \"npm run express\" \"npm run react\""
   },
   "dependencies": {
+    "aos": "^2.3.4",
     "concurrently": "^9.1.2"
   }
 }
