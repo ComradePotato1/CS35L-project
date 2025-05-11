@@ -18,7 +18,7 @@ const Login = () => {
         if (user) {
             navigate('/home');
         }
-    }, [navigate]);
+    });
 
 
     const handleSubmit = async (e) => {
@@ -70,8 +70,8 @@ const Login = () => {
                     <br></br>
                     <button type="submit" className="login-button">Login</button>
                     <br />
-                    <button className="login-button" onClick={handleRegister} >New to the site? Register</button>
                 </form>
+                <button className="login-button" onClick={handleRegister} >New to the site? Register</button>
                 
             </div>
         </div> 
