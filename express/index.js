@@ -224,6 +224,22 @@ app.post('/react', async (req, res) => {
     }
 });
 
+app.post('/unreact', async (req, res) => {
+    try {
+        const { log_id, username } = req.body;
+
+
+        const [result] = await pool.execute(
+            'DELETE FROM react where log_id= ? and username= ?',
+            [log_id, username]
+        );
+
+        res.status(200).json({ message: 'Unreact successful' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.post('/get-react', async (req, res) => {
     try {
         const { log_id } = req.body;

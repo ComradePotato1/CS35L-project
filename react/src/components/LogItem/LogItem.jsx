@@ -7,6 +7,7 @@ const LogItem = ({
     onSave,
     onCancel,
     onReact,
+    onUnreact,
     currentUser
 }) => {
     const [formData, setFormData] = useState({
@@ -30,6 +31,14 @@ const LogItem = ({
             log_id: log.log_id, 
             ...formData
         });
+    };
+
+    const handleReactClick = () => {
+        if (hasReacted) {
+            onUnreact(log.log_id);
+        } else {
+            onReact(log.log_id);
+        }
     };
 
     return (
@@ -139,8 +148,7 @@ const LogItem = ({
               Edit
             </button>
             <button
-              onClick={() => onReact(log.log_id)}
-              disabled={hasReacted}
+              onClick={() => handleReactClick(log.log_id)}
               className={`react-btn ${hasReacted ? 'reacted' : ''}`}
             >
               {hasReacted ? '✓ Liked' : 'Like'} 

@@ -11,6 +11,7 @@ import Logout from "./components/auth/logout.js"
 import Profile from "./components/profile/profile.js"
 import Cover from "./components/cover/cover.js"
 import Social from "./components/social/social.js"
+import User from "./components/user/user.js"
 import { Auth } from "./components/auth/auth.js"
 
 import { useEffect, useState } from "react";
@@ -40,6 +41,7 @@ function App() {
               <Route path="/history" element={ <ProtectedRoute> <History /> </ProtectedRoute>}/>
               <Route path="/profile" element={<ProtectedRoute> <Profile /> </ProtectedRoute> } />
               <Route path="/social" element={<ProtectedRoute> <Social /> </ProtectedRoute>} />
+              <Route path="/user/:queryUser" element={<ProtectedRoute><User /></ProtectedRoute> } />
           </Routes>
             </div>
         </Auth>

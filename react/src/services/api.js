@@ -1,4 +1,4 @@
-import axios from 'axios';
+/*import axios from 'axios';
 
 const API_BASE = 'http://localhost:5001'; //update if hosted elsewhere
 
@@ -23,4 +23,4 @@ export const editLog = async (log_id, updates) => {
         start: updates.start,
         end: updates.end,
     });
-};
+};*/

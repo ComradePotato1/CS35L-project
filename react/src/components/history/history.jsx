@@ -63,6 +63,19 @@ const History = () => {
     }
   };
 
+const handleUnreact = async (logId) => {
+    try {
+        await axios.post('http://localhost:5001/unreact', {
+            log_id: logId,
+            username: user
+        });
+        fetchLogs(); // Refresh to show updated reactions
+    } catch (err) {
+        console.error("Reaction failed:", err);
+    }
+};
+
+
   if (!user) return <p>Please log in to view history</p>;
   if (loading) return <div className="loading">Loading...</div>;
 
@@ -83,7 +96,8 @@ const History = () => {
                 onEdit={() => setEditingLogId(log.log_id)}
                 onSave={handleSaveLog}
                 onCancel={() => setEditingLogId(null)}
-                onReact={handleReact}
+                    onReact={handleReact}
+                    onUnreact={handleUnreact}
                 currentUser={user}
               />
             ))}
