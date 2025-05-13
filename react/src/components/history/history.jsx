@@ -38,15 +38,27 @@ const History = () => {
   // Unified save function (create/update)
   const handleSaveLog = async (logData) => {
     try {
-      await axios.post('http://localhost:5001/log', {
+      const response = await axios.post('http://localhost:5001/log', {
         ...logData,
-        username: user // Ensure username is attached
+        username: user
       });
-      fetchLogs(); // Refresh the list
+  
+      // Optimistic UI update instead of full refresh
+      setLogs(prevLogs => 
+        logData.log_id 
+          ? prevLogs.map(log => 
+              log.log_id === logData.log_id 
+                ? { ...log, ...logData } 
+                : log
+            )
+          : [...prevLogs, { ...logData, log_id: response.data.log_id }]
+      );
+      
       setEditingLogId(null);
     } catch (err) {
       console.error("Save failed:", err);
       alert(err.response?.data?.error || "Failed to save");
+      fetchLogs(); // Fallback refresh if optimistic update fails
     }
   };
 

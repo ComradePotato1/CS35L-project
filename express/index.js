@@ -149,19 +149,33 @@ app.post('/get-userinfo', async (req, res) => {
 
 app.post('/log', async (req, res) => {
     try {
-        const { username, activity, day, start, end, post } = req.body;
-
-
-        const [result] = await pool.execute(
-            'insert into log (username, activity, day, start, end, post) values (?, ?, ?, ?, ?, ?)',
-            [username, activity, day, start, end, post]
+      const { log_id, username, activity, day, start, end, post } = req.body;
+  
+      if (log_id) {
+        // Update existing log
+        await pool.execute(
+          `UPDATE log 
+           SET activity=?, day=?, start=?, end=?, post=?
+           WHERE log_id=? AND username=?`,
+          [activity, day, start, end, post, log_id, username]
         );
-
-        res.status(200).json({ message: 'Log successful' });
+        return res.status(200).json({ message: 'Log updated successfully' });
+      } else {
+        // Create new log
+        const [result] = await pool.execute(
+          `INSERT INTO log (username, activity, day, start, end, post)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [username, activity, day, start, end, post]
+        );
+        return res.status(200).json({ 
+          message: 'Log created successfully',
+          log_id: result.insertId 
+        });
+      }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message });
     }
-});
+  });
 
 app.post('/get-log', async (req, res) => {
     try {
