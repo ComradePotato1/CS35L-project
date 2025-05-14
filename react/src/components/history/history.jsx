@@ -16,7 +16,7 @@ const History = () => {
   const fetchLogs = async () => {
     try {
       const response = await axios.post('http://localhost:5001/get-log', {
-        username: user,
+        username: [user],
         range_start: page * ITEMS_PER_PAGE,
         range_end: (page + 1) * ITEMS_PER_PAGE
       });

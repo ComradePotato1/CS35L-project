@@ -18,8 +18,10 @@ const Navbar = () => {
                 <img src="" alt="logo" className="logo-image"/>
             </a>
             <div className="links">
-                <a href="/home" className="home">Home</a>
-                
+                {user ? (
+                    <a href="/home" className="home">Home</a>
+                ) : (<span />)
+                }
 
                 {user ? (
                     <a href="/history" className="home">History</a>

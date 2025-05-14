@@ -16,7 +16,7 @@ const User = () => {
     const fetchLogs = async () => {
         try {
             const response = await axios.post('http://localhost:5001/get-log', {
-                username: queryUser,
+                username: [user],
                 range_start: 1,
                 range_end: 5,
             });
@@ -74,7 +74,7 @@ const User = () => {
                                 log={log}
                                 onReact={handleReact}
                                 onUnreact={handleUnreact}
-                                currentUser={user}
+                                currentUser={queryUser}
                             />
                         ))}
                     </div>

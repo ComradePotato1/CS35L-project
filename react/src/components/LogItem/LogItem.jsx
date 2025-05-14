@@ -1,16 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { AuthContext } from "../auth/auth.js"
+
 
 const LogItem = ({
     log,
     isEditing,
-    onEdit,
-    onSave,
-    onCancel,
+    onEdit=null,
+    onSave=null,
+    onCancel=null,
     onReact,
     onUnreact,
-    currentUser
+    currentUser,
+    showHeader=false
 }) => {
+
+    const { user } = useContext(AuthContext);
+
+
     const [formData, setFormData] = useState({
+        username: log.username,
         activity: log.activity || '',
         day: log.day ? log.day.split('T')[0] : '', // format for date input
         start: log.start || '',
@@ -131,15 +139,20 @@ const LogItem = ({
                 </form>
             ) : (
                 // View Mode
-                <>
+                    <>
+                        {showHeader ? (
+                            <div classname="log-username">post made by <a href={ "/user/" + log.username }>{log.username}</a></div>
+                        ) : (
+                            <></>
+                        ) }
+                        
                     <div className="log-header">
                         <h3>{log.activity}</h3>
                         <span className="timestamp">
                             {new Date(log.timestamp).toLocaleString()}
                         </span>
                     </div>
-
-                    <div className="log-details">
+                        <div className="log-details">
                         {log.post && <p className="log-notes">{log.post}</p>}
                         <div className="log-meta">
                             <span className="log-date">{log.day}</span>
@@ -149,13 +162,18 @@ const LogItem = ({
                         </div>
                     </div>
 
-                    <div className="log-actions">
-                        <button 
-                            onClick={() => onEdit(log.log_id)} 
-                            className="edit-btn"
-                        >
-                            Edit
-                        </button>
+                        <div className="log-actions">
+                            {currentUser === log.username ? (
+                                <button
+                                    onClick={() => onEdit(log.log_id)}
+                                    className="edit-btn"
+                                >
+                                    Edit
+                                </button>) : (
+                                    <></>
+                                )
+
+                         }
                         <button
                             onClick={handleReactClick}
                             className={`react-btn ${hasReacted ? 'reacted' : ''}`}
