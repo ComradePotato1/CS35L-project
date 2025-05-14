@@ -15,7 +15,7 @@ const Home = () => {
   const [activity, setActivity] = useState('');
   const [day, setDay] = useState(today);
   const [start, setStart] = useState('');
-  const [end, setEnd] = useState('');
+  const [duration, setDuration] = useState('');
   const [post, setPost] = useState('');
   const [error, setError] = useState('');
   const [icon, setIcon] = useState('/images/icons/workout.svg');
@@ -46,13 +46,13 @@ const Home = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (start && end && start >= end) {
-      setError('Start time must be before end time');
+    if (duration <= 0) {
+      setError('Duration must be at least 1 minute');
       return;
     }
 
-    if (day === today && end && end >= currentTime) {
-      setError('End time cannot be later than the current time');
+    if (duration > 1440){
+      setError('Duration cannot exceed 24 hours')
       return;
     }
 
@@ -62,7 +62,7 @@ const Home = () => {
         activity,
         day,
         start,
-        end,
+        duration,
         post
       });
 
@@ -70,7 +70,7 @@ const Home = () => {
       setActivity('');
       setDay(today); //default to todays date, should prob make end date to length of workout.
       setStart('');
-      setEnd('');
+      setDuration('');
       setPost('');
       setError('');
       setIcon('/images/icons/workout.svg');
@@ -125,19 +125,22 @@ const Home = () => {
           </div>
 
           <div>
-            <label>End Time:</label>
+            <label>Duration:</label>
             <input
-              type="time"
-              value={end}
-              onChange={e => { setEnd(e.target.value); setError(''); }}
-              max={day === today ? currentTime : undefined}
+              type="text"
+              min ="1"
+              max="1440"
+              value={duration}
+              onChange={e => { setDuration(e.target.value); setError(''); }}
+              placeholder="Duration"
               required
             />
           </div>
 
           <div>
             <label>Notes:</label>
-            <textarea
+            <input
+              type="text"
               value={post}
               onChange={e => setPost(e.target.value)}
               placeholder="Comments"

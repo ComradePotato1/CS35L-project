@@ -29,7 +29,7 @@ const pool = mysql.createPool({
 
 pool.query(`USE ${process.env.DB_NAME}`);
 pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), weight SMALLINT(15), height SMALLINT(15), dailyGoal BOOLEAN, weeklyGoal BOOLEAN )");
-pool.query("CREATE TABLE IF NOT EXISTS log ( log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME(0), end TIME(0), post VARCHAR(255))");
+pool.query(`CREATE TABLE IF NOT EXISTS log (log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME, duration INT, post VARCHAR(255))`); 
 pool.query("CREATE TABLE IF NOT EXISTS react ( log_id INT, username VARCHAR(255) )");
 pool.query("CREATE TABLE IF NOT EXISTS follow ( follower VARCHAR(255) , followee VARCHAR(255) )");
 
@@ -149,23 +149,31 @@ app.post('/get-userinfo', async (req, res) => {
 
 app.post('/log', async (req, res) => {
     try {
-      const { log_id, username, activity, day, start, end, post } = req.body;
+      const { log_id, username, activity, day, start, duration, post } = req.body;
+
+      if (duration <= 0) {
+        return res.status(4004).json({ error: "Duration must be positive"});
+      }
+
+      if (duration > 1440) {
+        return res.status(400).json({ error: "Duration exceeds 24 hours"});
+      }
   
       if (log_id) {
         // Update existing log
         await pool.execute(
           `UPDATE log 
-           SET activity=?, day=?, start=?, end=?, post=?
+           SET activity=?, day=?, start=?, duration=?, post=?
            WHERE log_id=? AND username=?`,
-          [activity, day, start, end, post, log_id, username]
+          [activity, day, start, duration, post, log_id, username]
         );
         return res.status(200).json({ message: 'Log updated successfully' });
       } else {
         // Create new log
         const [result] = await pool.execute(
-          `INSERT INTO log (username, activity, day, start, end, post)
+          `INSERT INTO log (username, activity, day, start, duration, post)
            VALUES (?, ?, ?, ?, ?, ?)`,
-          [username, activity, day, start, end, post]
+          [username, activity, day, start, duration, post]
         );
         return res.status(200).json({ 
           message: 'Log created successfully',
@@ -381,13 +389,13 @@ app.post('/get-user-rec', async (req, res) => {
 
 app.post('/update-log', async (req, res) => {
     try {
-        const { log_id, activity, post, day, start, end } = req.body;
+        const { log_id, activity, post, day, start, duration } = req.body;
 
         await pool.executes(
             `UPDATE log
-            SET activity = ?, post = ?, day = ?, start = ?, end = ?
+            SET activity = ?, post = ?, day = ?, start = ?, duration = ?
             WHERE log_id = ?`,
-            [activity, post, day, start, end, log_id]
+            [activity, post, day, start, duration, log_id]
         );
         res.status(200).json({ message: 'Log updated successfully' });
     } catch (error) {

@@ -12,9 +12,9 @@ const LogItem = ({
 }) => {
     const [formData, setFormData] = useState({
         activity: log.activity || '',
-        day: log.day ? log.day.split('T')[0] : '', //format for date input
+        day: log.day ? log.day.split('T')[0] : '', // format for date input
         start: log.start || '',
-        end: log.end || '',
+        duration: log.duration || 30, // Default to 30 minutes
         post: log.post || ''
     });
 
@@ -41,11 +41,18 @@ const LogItem = ({
         }
     };
 
+    // Helper to format duration for display
+    const formatDuration = (minutes) => {
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+    };
+
     return (
         <div className={`log-item ${isEditing ? 'editing' : ''}`}>
             {isEditing ? (
                 // Edit Mode
-                 <form onSubmit={handleSubmit} className="edit-form">
+                <form onSubmit={handleSubmit} className="edit-form">
                     <div className="form-group">
                         <label>Activity:</label>
                         <select
@@ -86,11 +93,13 @@ const LogItem = ({
                         </div>
 
                         <div className="form-group">
-                            <label>End Time:</label>
+                            <label>Duration (minutes):</label>
                             <input
-                                type="time"
-                                name="end"
-                                value={formData.end}
+                                type="number"
+                                name="duration"
+                                min="1"
+                                max="1440" // 24 hours
+                                value={formData.duration}
                                 onChange={handleChange}
                                 required
                             />
@@ -122,46 +131,45 @@ const LogItem = ({
                 </form>
             ) : (
                 // View Mode
-        <>
-          <div className="log-header">
-            <h3>{log.activity}</h3>
-            <span className="timestamp">
-              {new Date(log.timestamp).toLocaleString()}
-            </span>
-          </div>
+                <>
+                    <div className="log-header">
+                        <h3>{log.activity}</h3>
+                        <span className="timestamp">
+                            {new Date(log.timestamp).toLocaleString()}
+                        </span>
+                    </div>
 
-          <div className="log-details">
-            {log.post && <p className="log-notes">{log.post}</p>}
-            <div className="log-meta">
-              <span className="log-date">{log.day}</span>
-              <span className="log-time">
-                {log.start} - {log.end}
-              </span>
-            </div>
-          </div>
+                    <div className="log-details">
+                        {log.post && <p className="log-notes">{log.post}</p>}
+                        <div className="log-meta">
+                            <span className="log-date">{log.day}</span>
+                            <span className="log-time">
+                                Started at: {log.start} • Duration: {formatDuration(log.duration)}
+                            </span>
+                        </div>
+                    </div>
 
-          <div className="log-actions">
-            <button 
-              onClick={() => onEdit(log.log_id)} 
-              className="edit-btn"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleReactClick(log.log_id)}
-              className={`react-btn ${hasReacted ? 'reacted' : ''}`}
-            >
-              {hasReacted ? '✓ Liked' : 'Like'} 
-              {log.reacts?.length > 0 && (
-                <span className="react-count">{log.reacts.length}</span>
-              )}
-            </button>
-          </div>
-        </>
-      )}
-    </div>
-  );
-
+                    <div className="log-actions">
+                        <button 
+                            onClick={() => onEdit(log.log_id)} 
+                            className="edit-btn"
+                        >
+                            Edit
+                        </button>
+                        <button
+                            onClick={handleReactClick}
+                            className={`react-btn ${hasReacted ? 'reacted' : ''}`}
+                        >
+                            {hasReacted ? '✓ Liked' : 'Like'} 
+                            {log.reacts?.length > 0 && (
+                                <span className="react-count">{log.reacts.length}</span>
+                            )}
+                        </button>
+                    </div>
+                </>
+            )}
+        </div>
+    );
 };
 
 export default LogItem;

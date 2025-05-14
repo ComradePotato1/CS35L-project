@@ -35,7 +35,6 @@ const History = () => {
     }
   }, [user, page]);
 
-  // Unified save function (create/update)
   const handleSaveLog = async (logData) => {
     try {
       const response = await axios.post('http://localhost:5001/log', {

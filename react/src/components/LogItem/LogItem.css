@@ -22,6 +22,16 @@
     color: #7f8c8d;
     font-size: 0.9rem;
   }
+
+  input[type="number"] {
+    padding: 0.5rem;
+    width: 80px;
+}
+
+.log-time {
+    display: block;
+    margin-top: 0.3rem;
+}
   
   .log-details {
     margin: 0.5rem 0;
