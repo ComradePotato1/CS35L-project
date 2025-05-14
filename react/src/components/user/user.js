@@ -12,13 +12,14 @@ const User = () => {
     const { queryUser } = useParams();
     const [logs, setLogs] = useState([]);
     const [userExists, setUserExists] = useState(true)
+    const [editingLogId, setEditingLogId] = useState(null);
 
     const fetchLogs = async () => {
         try {
             const response = await axios.post('http://localhost:5001/get-log', {
-                username: [user],
-                range_start: 1,
-                range_end: 5,
+                username: [queryUser],
+                range_start: 0,
+                range_end: 3,
             });
             setLogs(response.data.combined || []);
         } catch (err) {
@@ -51,9 +52,38 @@ const User = () => {
         }
     };
 
+
+    const handleSaveLog = async (logData) => {
+        try {
+            const response = await axios.post('http://localhost:5001/log', {
+                ...logData,
+                username: user
+            });
+
+            // Optimistic UI update instead of full refresh
+            setLogs(prevLogs =>
+                logData.log_id
+                    ? prevLogs.map(log =>
+                        log.log_id === logData.log_id
+                            ? { ...log, ...logData }
+                            : log
+                    )
+                    : [...prevLogs, { ...logData, log_id: response.data.log_id }]
+            );
+
+            setEditingLogId(null);
+        } catch (err) {
+            console.error("Save failed:", err);
+            alert(err.response?.data?.error || "Failed to save");
+            fetchLogs(); // Fallback refresh if optimistic update fails
+        }
+    };
+
     useEffect(() => {
-        fetchLogs();
-    });
+        if (queryUser) {
+            fetchLogs();
+        }
+    }, [queryUser]);
 
     return (
         <div>
@@ -72,9 +102,13 @@ const User = () => {
                             <LogItem
                                 key={log.log_id}
                                 log={log}
+                                isEditing={editingLogId === log.log_id}
+                                onEdit={() => setEditingLogId(log.log_id)}
+                                onSave={handleSaveLog}
+                                onCancel={() => setEditingLogId(null)}
                                 onReact={handleReact}
                                 onUnreact={handleUnreact}
-                                currentUser={queryUser}
+                                currentUser={user}
                             />
                         ))}
                     </div>

@@ -189,14 +189,15 @@ app.post('/get-log', async (req, res) => {
     try {
         const { username, range_start, range_end } = req.body;
         let rows;
-        if (username == 'admin') {
+        if (username == ['admin']) {
             [rows] = await pool.execute(
                 'SELECT * FROM log ORDER BY timestamp DESC',
             );
         } else {
+            const placeholders = username.map(() => '?').join(',');
             [rows] = await pool.execute(
-                'SELECT * FROM log WHERE username = ? ORDER BY timestamp DESC',
-                [username]
+                'SELECT * FROM log WHERE username in (' + placeholders + ') ORDER BY timestamp DESC',
+                [...username]
             );
         }
 
@@ -376,7 +377,7 @@ app.post('/get-user-rec', async (req, res) => {
         for (let i = Math.floor(Math.random() * users.length); result.length < Math.min(2, users.length-exclude.length); i = Math.floor(Math.random() * users.length)) {
             if (i != chosen.slice(-1)[0] && exclude.indexOf(users[i].username) == -1) {
                 chosen.push(i);
-                result.push({ username: users[i].username, name: users[i].name });
+                result.push(users[i].username);
             }
         }
         
