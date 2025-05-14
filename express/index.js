@@ -289,13 +289,20 @@ app.post('/get-react', async (req, res) => {
 
 app.post('/follow', async (req, res) => {
     try {
-        const { follower, followee } = req.body;
+        const { follower, followee, unfollow } = req.body;
 
-
-        const [result] = await pool.execute(
-            'insert into follow (follower, followee) values (?, ?)',
-            [follower, followee]
-        );
+        if (unfollow) {
+            await pool.execute(
+                'delete from follow where follower = ? and followee = ?',
+                [follower, followee]
+            );
+        } else {
+            await pool.execute(
+                'insert into follow (follower, followee) values (?, ?)',
+                [follower, followee]
+            );
+        }
+        
 
         res.status(200).json({ message: 'Follow successful' });
     } catch (error) {
@@ -303,6 +310,7 @@ app.post('/follow', async (req, res) => {
     }
 });
 
+//note - follower is the one requesting to follow and followee is the one being followed
 app.post('/get-follower', async (req, res) => {
     try {
         const { followee } = req.body;
@@ -372,9 +380,9 @@ app.post('/get-user-rec', async (req, res) => {
 
         let result = [];
         let chosen = [];
-        //change length as necessary, 2 for testing
+        //change length as necessary, 3 for testing
         //implement better randomization
-        for (let i = Math.floor(Math.random() * users.length); result.length < Math.min(2, users.length-exclude.length); i = Math.floor(Math.random() * users.length)) {
+        for (let i = Math.floor(Math.random() * users.length); result.length < Math.min(3, users.length-exclude.length); i = Math.floor(Math.random() * users.length)) {
             if (i != chosen.slice(-1)[0] && exclude.indexOf(users[i].username) == -1) {
                 chosen.push(i);
                 result.push(users[i].username);

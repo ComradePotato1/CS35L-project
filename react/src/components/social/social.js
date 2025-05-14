@@ -54,8 +54,8 @@ const Social = () => {
 
             const response = await axios.post('http://localhost:5001/get-log', {
                 username: recs,
-                range_start: 1,
-                range_end: 3,
+                range_start: 0,
+                range_end: 2,
             });
             log = response.data.combined;
 
@@ -73,11 +73,10 @@ const Social = () => {
         try {
             const response = await axios.post('http://localhost:5001/get-log', {
                 username: following,
-                range_start: 1,
-                range_end: 3,
+                range_start: 0,
+                range_end: 2,
             });
             setFollowLogs(response.data.combined || []);
-            alert("fetch success");
         } catch (err) {
             console.error("Failed to fetch logs:", err);
         }
@@ -95,6 +94,7 @@ const Social = () => {
                 username: user
             });
             fetchRecLogs();
+            fetchFollowLogs();
         } catch (err) {
             console.error("Reaction failed:", err);
         }
@@ -107,6 +107,7 @@ const Social = () => {
                 username: user
             });
             fetchRecLogs();
+            fetchFollowLogs();
         } catch (err) {
             console.error("Reaction failed:", err);
         }
@@ -144,14 +145,14 @@ const Social = () => {
                 ) : (
                     <>
                         <div className="log-list">
-                            {recLogs.map((log) => (
+                            {followLogs.map((log) => (
                                 <LogItem
                                     key={log.log_id}
                                     log={log}
                                     isEditing={false}
                                     onReact={handleReact}
                                     onUnreact={handleUnreact}
-                                    currentUser={""}
+                                    currentUser={user}
                                     showHeader={true}
                                 />
                             ))}

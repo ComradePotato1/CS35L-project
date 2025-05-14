@@ -13,6 +13,7 @@ const User = () => {
     const [logs, setLogs] = useState([]);
     const [userExists, setUserExists] = useState(true)
     const [editingLogId, setEditingLogId] = useState(null);
+    const [isFollowing, setIsFollowing] = useState(false);
 
     const fetchLogs = async () => {
         try {
@@ -75,11 +76,38 @@ const User = () => {
         } catch (err) {
             console.error("Save failed:", err);
             alert(err.response?.data?.error || "Failed to save");
-            fetchLogs(); // Fallback refresh if optimistic update fails
+            fetchLogs()
         }
     };
 
+    const handleFollow = async () => {
+        try {
+            await axios.post('http://localhost:5001/follow', {
+                follower: user,
+                followee: queryUser,
+                unfollow: isFollowing
+            })
+            setIsFollowing(!isFollowing)
+        } catch (err) {
+            console.error("folllow failed ", err)
+        }
+    }
+
+    const refreshFollow = async () => {
+        try {
+            const response = await axios.post("http://localhost:5001/get-follower", {
+                followee: queryUser
+            })
+            setIsFollowing(response.data.result.indexOf(user) !== -1);
+        }
+        catch (err) {
+            console.error("get follow failed")
+        }
+    }
+
+
     useEffect(() => {
+        refreshFollow();
         if (queryUser) {
             fetchLogs();
         }
@@ -88,7 +116,14 @@ const User = () => {
     return (
         <div>
             {userExists ? (
+                <>
                 <p>user page for {queryUser}</p>
+                    <button
+                        onClick={handleFollow}
+                    >
+                        {isFollowing ? 'Following' : 'Follow'}
+                    </button>
+                </>
             ) : (<>
                 <p>user does not exist</p>
             </>)}
