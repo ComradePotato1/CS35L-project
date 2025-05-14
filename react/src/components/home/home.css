@@ -57,7 +57,6 @@
   /* Ensure input and textarea use the same font (monospace to match comments) */
   .form input,
   .form textarea {
-    font-family: monospace;
     font-size: var(--largefontsize);
     height: var(--stanheight);
     width: var(--stanwidth);
@@ -85,11 +84,7 @@
     box-shadow: var(--buttonshadow);
     cursor: pointer;
   }
-  
-  .form button:hover {
-    filter: brightness(0.8);
-  }
-  
+
   .errors {
     width: 100%;
     text-align: center;

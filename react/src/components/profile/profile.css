@@ -1,34 +1,109 @@
-.container {
-  max-width: 40rem;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: #f9f9f9;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+:root {
+    --stanwidth: 15rem;
+    --stanheight: 3rem;
+    --largefontsize: 1rem;
+    --stanbradius: 0.5rem;
+    --stanshadow: 0px 4px 6px rgba(0, 0, 0, 0.08);
+    --buttonback: #4499cc;
+    --buttonshadow: 0px 4px 6px rgba(0, 0, 0, 0.05);
+    --gap: 1rem;
 }
 
-.container h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
+.profile-page {
+    max-width: 40rem;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: var(--stanbradius);
+    box-shadow: var(--stanshadow);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
 }
 
-.profile {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.tag {
-  font-weight: bold;
-  color: #333;
-}
-
-.val {
-  color: #555;
+.profile-page h2 {
+    text-align: center;
+    margin: 0;
 }
 
 .errors {
-  color: red;
+    color: red;
+    text-align: center;
+}
+
+.profile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tag {
+    font-weight: bold;
+}
+
+.val {
+    font-family: monospace;
+}
+
+.profile input[type="text"],
+.profile input[type="number"] {
+    width: var(--stanwidth);
+    height: var(--stanheight);
+    font-size: var(--largefontsize);
+    padding: 0 0.5rem;
+    border: none;
+    border-radius: var(--stanbradius);
+    box-shadow: var(--stanshadow);
+}
+
+.profile input[type="checkbox"] {
+    transform: scale(1.2);
+}
+
+.edit-button,
+.save-button {
+    position: absolute;
+    top: var(--gap);
+    font-family: monospace;
+    padding: 0.5rem 1rem;
+    background: var(--buttonback);
+    color: #fff;
+    border: none;
+    border-radius: var(--stanbradius);
+    cursor: pointer;
+    box-shadow: var(--buttonshadow);
+}
+
+.edit-button {
+    right: var(--gap);
+}
+
+.profile-page.editing .edit-button {
+    right: auto;
+    left: var(--gap);
+}
+
+.save-button {
+    right: var(--gap);
+}
+
+@media (max-width: 600px) {
+    .profile {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .profile input {
+        width: 100%;
+    }
+}
+
+.logout {
+  margin-top: var(--gap);
   text-align: center;
-  margin-bottom: 1rem;
+  display: block;
+  color: var(--buttonback);
+  text-decoration: none;
+  font-weight: bold;
+  text-decoration: underline;
 }

@@ -74,8 +74,8 @@ const Home = () => {
       setPost('');
       setError('');
       setIcon('/images/icons/workout.svg');
-    } catch (err) {
-      console.error('Failed to add Workout:', err.response?.data || err);
+    } catch (error) {
+      console.error('Failed to add Workout:', error.response?.data || error);
       alert('There was an error adding your workout.');
     }
   };
