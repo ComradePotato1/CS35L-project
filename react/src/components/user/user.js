@@ -17,10 +17,14 @@ const User = () => {
 
     const fetchLogs = async () => {
         try {
+            let numLogs = 3;
+            if (isFollowing) {
+                numLogs = 20;
+            }
             const response = await axios.post('http://localhost:5001/get-log', {
                 username: [queryUser],
                 range_start: 0,
-                range_end: 3,
+                range_end: numLogs,
             });
             setLogs(response.data.combined || []);
         } catch (err) {
@@ -111,7 +115,7 @@ const User = () => {
         if (queryUser) {
             fetchLogs();
         }
-    }, [queryUser]);
+    }, [queryUser, isFollowing]);
 
     return (
         <div>
