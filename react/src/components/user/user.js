@@ -19,7 +19,7 @@ const User = () => {
         try {
             let numLogs = 3;
             if (isFollowing) {
-                numLogs = 20;
+                numLogs = 15;
             }
             const response = await axios.post('http://localhost:5001/get-log', {
                 username: [queryUser],
@@ -151,7 +151,7 @@ const User = () => {
                             />
                         ))}
                     </div>
-
+                        <p>Showing at most { Math.min(logs.length, 15) } entries</p>
                    
                 </>
             )}

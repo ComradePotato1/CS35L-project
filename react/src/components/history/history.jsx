@@ -10,7 +10,7 @@ const History = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [editingLogId, setEditingLogId] = useState(null);
-  const ITEMS_PER_PAGE = 7; // Matches your requirement
+  const ITEMS_PER_PAGE = 7;
 
   // Fetch logs from backend
   const fetchLogs = async () => {

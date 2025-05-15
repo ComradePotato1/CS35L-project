@@ -10,7 +10,9 @@ const Social = () => {
     const [recs, setRecs] = useState([])
     const [following, setFollowing] = useState([])
     const [recLogs, setRecLogs] = useState([]);
-    const [followLogs, setFollowLogs] = useState([])
+    const [followLogs, setFollowLogs] = useState([]);
+    const [page, setPage] = useState(0);
+    const ITEMS_PER_PAGE = 3;
 
     const getRecs = async () => {
         try {
@@ -73,8 +75,8 @@ const Social = () => {
         try {
             const response = await axios.post('http://localhost:5001/get-log', {
                 username: following,
-                range_start: 0,
-                range_end: 2,
+                range_start: page * ITEMS_PER_PAGE,
+                range_end: (page + 1) * ITEMS_PER_PAGE
             });
             setFollowLogs(response.data.combined || []);
         } catch (err) {
@@ -86,6 +88,10 @@ const Social = () => {
         fetchRecLogs();
         fetchFollowLogs();
     }, [recs, following]);
+
+    useEffect(() => {
+        fetchFollowLogs();
+    }, [page]);
 
     const handleReact = async (logId) => {
         try {
@@ -156,7 +162,22 @@ const Social = () => {
                                     showHeader={true}
                                 />
                             ))}
-                        </div>
+                            </div>
+                            <div className="pagination">
+                                <button
+                                    onClick={() => setPage(p => Math.max(0, p - 1))}
+                                    disabled={page === 0}
+                                >
+                                    Previous
+                                </button>
+                                <span>Page {page + 1}</span>
+                                <button
+                                    onClick={() => setPage(p => p + 1)}
+                                    disabled={followLogs.length < ITEMS_PER_PAGE}
+                                >
+                                    Next
+                                </button>
+                            </div>
                     </>
                 )}
             </div>

@@ -32,6 +32,7 @@ pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMAR
 pool.query(`CREATE TABLE IF NOT EXISTS log (log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME, duration INT, post VARCHAR(255))`); 
 pool.query("CREATE TABLE IF NOT EXISTS react ( log_id INT, username VARCHAR(255) )");
 pool.query("CREATE TABLE IF NOT EXISTS follow ( follower VARCHAR(255) , followee VARCHAR(255) )");
+//pool.query("CREATE TABLE IF NOT EXISTS requests ( follower VARCHAR(255) , followee VARCHAR(255) )");
 
 app.get('/test', async (req, res) => {
     res.status(200).json({ message: 'test success' });
@@ -188,18 +189,11 @@ app.post('/log', async (req, res) => {
 app.post('/get-log', async (req, res) => {
     try {
         const { username, range_start, range_end } = req.body;
-        let rows;
-        if (username == ['admin']) {
-            [rows] = await pool.execute(
-                'SELECT * FROM log ORDER BY timestamp DESC',
-            );
-        } else {
-            const placeholders = username.map(() => '?').join(',');
-            [rows] = await pool.execute(
-                'SELECT * FROM log WHERE username in (' + placeholders + ') ORDER BY timestamp DESC',
-                [...username]
-            );
-        }
+        const placeholders = username.map(() => '?').join(',');
+        const [rows] = await pool.execute(
+            'SELECT * FROM log WHERE username in (' + placeholders + ') ORDER BY timestamp DESC',
+            [...username]
+        );
 
         if (rows.length === 0) {
             return res.status(401).json({ error: 'Username not found' });
@@ -309,6 +303,58 @@ app.post('/follow', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+/* implement follow requests? 
+app.post('/get-request', async (req, res) => {
+    try {
+        const { username } = req.body;
+
+        [rows] = await pool.execute(
+            'SELECT * FROM request where followee = ?',
+            [username]
+        );
+
+
+        res.status(200).json({ rows });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/approve-follow', async (req, res) => {
+    try {
+        const { follower, followee } = req.body;
+
+        await pool.execute(
+            'delete from request where follower = ? and followee = ?',
+            [follower, followee]
+        );
+        await pool.execute(
+            'insert into follow (follower, followee) values (?, ?)',
+            [follower, followee]
+        );
+        
+
+
+        res.status(200).json({ message: 'Follow successful' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/reject-follow', async (req, res) => {
+    try {
+        const { follower, followee } = req.body;
+
+        await pool.execute(
+            'delete from request where follower = ? and followee = ?',
+            [follower, followee]
+        );
+
+        res.status(200).json({ message: 'reject successful' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});*/
 
 //note - follower is the one requesting to follow and followee is the one being followed
 app.post('/get-follower', async (req, res) => {
@@ -351,6 +397,48 @@ app.post('/get-followee', async (req, res) => {
         let result = [];
         for (let i = 0; i < rows.length; i++) {
             result.push(rows[i].followee);
+        }
+
+        res.status(200).json({ result });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/get-follow-back', async (req, res) => {
+    try {
+        const { username } = req.body;
+        //following
+        const [followee] = await pool.execute(
+            'SELECT * FROM follow WHERE follower = ? ORDER BY followee',
+            [username]
+        );
+
+        const [follower] = await pool.execute(
+            'SELECT * FROM follow WHERE followee = ? ORDER BY follower',
+            [username]
+        );
+
+        
+
+        let result = [];
+        let i = 0, j = 0;
+
+        while (i < follower.length && j < followee.length) {
+            if (follower[i].follower === followee[j].followee) {
+                i++;
+                j++;
+            } else if (follower[i].follower < followee[j].followee) {
+                result.push(follower[i].follower);
+                i++;
+            } else {
+                j++;
+            }
+        }
+
+        while (i < follower.length) {
+            result.push(follower[i].follower);
+            i++;
         }
 
         res.status(200).json({ result });

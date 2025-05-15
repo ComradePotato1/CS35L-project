@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../auth/auth.js';
-
+import axios from 'axios';
 import "./navbar.css";
 
 const Navbar = () => {
@@ -9,7 +9,24 @@ const Navbar = () => {
     const location = useLocation();
     const excludedRoutes = ['/'];
     const hideNavbar = excludedRoutes.includes(location.pathname);
+    const [followbackCount, setFollowbackCount] = useState(0);
 
+    useEffect(() => {
+        const handleCount = async () => {
+            try {
+                const res = await axios.post('http://localhost:5001/get-follow-back', {
+                    username: user,
+                });
+                setFollowbackCount(res.data.result.length);
+            } catch (err) {
+                alert(err);
+                console.error("Get count failed:", err);
+            }
+        }
+
+        handleCount();
+
+    } );
 
     return (
         !hideNavbar && (
@@ -28,8 +45,8 @@ const Navbar = () => {
                 ) : (<span />)
                 }
 
-                {user ? (
-                    <a href="/social" className="home">Social</a>
+                    {user ? (
+                        <a href="/social" className="home">Social {followbackCount}</a>
                 ) : (<span />)
                 }
 
