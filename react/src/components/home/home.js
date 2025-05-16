@@ -78,7 +78,7 @@ const Home = () => {
 
       setActivity('');
       setDay(today); //default to todays date, should prob make end date to length of workout.
-      setStart('');
+      setStart(currentTime);
       setDuration('');
       setPost('');
       setError('');
@@ -136,12 +136,13 @@ const Home = () => {
           <div>
             <label>Duration:</label>
             <input
-              type="text"
-              min ="1"
-              max="1440"
+              type="number"
+              name="duration"
+              min ={1}
+              max={1440}
               value={duration}
                           onChange={e => { setDuration(e.target.value); autoUpdateStart(e.target.value); setError(''); }}
-              placeholder="Duration"
+              placeholder="Duration (in minutes)"
               required
             />
           </div>

@@ -153,7 +153,7 @@ app.post('/log', async (req, res) => {
       const { log_id, username, activity, day, start, duration, post } = req.body;
 
       if (duration <= 0) {
-        return res.status(4004).json({ error: "Duration must be positive"});
+        return res.status(400).json({ error: "Duration must be positive"});
       }
 
       if (duration > 1440) {
