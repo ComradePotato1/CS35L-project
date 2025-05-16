@@ -46,7 +46,14 @@ const Navbar = () => {
                 }
 
                     {user ? (
-                        <a href="/social" className="home">Social {followbackCount}</a>
+                        <div>
+                            {followbackCount ? (
+                                <a href="/social" className="hover">Social {followbackCount}</a>
+                            ) : (
+                                <a href="/social" className="home">Social</a>
+                            )}
+                            
+                        </div>
                 ) : (<span />)
                 }
 

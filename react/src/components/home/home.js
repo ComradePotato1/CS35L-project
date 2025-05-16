@@ -14,7 +14,7 @@ const Home = () => {
 
   const [activity, setActivity] = useState('');
   const [day, setDay] = useState(today);
-  const [start, setStart] = useState('');
+  const [start, setStart] = useState(currentTime);
   const [duration, setDuration] = useState('');
   const [post, setPost] = useState('');
   const [error, setError] = useState('');
@@ -41,7 +41,16 @@ const Home = () => {
     else {
       setIcon('/images/icons/workout.svg');
     }
-  }
+    }
+
+    const autoUpdateStart = (e) => {
+        let updated = new Date();
+        //updated.setHours(start.split(":")[0]);
+        //updated.setMinutes(start.split(":")[1]);
+        updated = new Date(updated - 60000 * e);
+        setStart(updated.toTimeString().slice(0, 5))
+        
+    }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -131,7 +140,7 @@ const Home = () => {
               min ="1"
               max="1440"
               value={duration}
-              onChange={e => { setDuration(e.target.value); setError(''); }}
+                          onChange={e => { setDuration(e.target.value); autoUpdateStart(e.target.value); setError(''); }}
               placeholder="Duration"
               required
             />

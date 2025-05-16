@@ -9,8 +9,10 @@ const Social = () => {
     const { user } = useContext(AuthContext);
     const [recs, setRecs] = useState([])
     const [following, setFollowing] = useState([])
+    const [follower, setFollower] = useState([]);
     const [recLogs, setRecLogs] = useState([]);
     const [followLogs, setFollowLogs] = useState([]);
+    const [followerLogs, setFollowerLogs] = useState([]);
     const [page, setPage] = useState(0);
     const ITEMS_PER_PAGE = 3;
 
@@ -40,11 +42,23 @@ const Social = () => {
         }
     };
 
+    const getFollower = async () => {
+        try {
+            const follow = await axios.post('http://localhost:5001/get-follow-back', {
+                username: user
+            });
+            setFollower(follow.data.result);
+
+        } catch (err) {
+            console.error("Get following failed:", err);
+        }
+    }
+
 
     useEffect(() => {
         getRecs();
         getFollowing();
-        
+        getFollower();
 
     }, []);
 
@@ -84,10 +98,23 @@ const Social = () => {
         }
     };
 
+    const fetchFollowerLogs = async () => {
+        try {
+            const response = await axios.post('http://localhost:5001/get-log', {
+                username: follower,
+                range_start: page * ITEMS_PER_PAGE,
+                range_end: (page + 1) * ITEMS_PER_PAGE
+            });
+            setFollowerLogs(response.data.combined || []);
+        } catch (err) {
+            console.error("Failed to fetch logs:", err);
+        }
+    };
     useEffect(() => {
         fetchRecLogs();
         fetchFollowLogs();
-    }, [recs, following]);
+        fetchFollowerLogs();
+    }, [recs, following, follower]);
 
     useEffect(() => {
         fetchFollowLogs();
@@ -124,7 +151,29 @@ const Social = () => {
         <div>
             {user && <p>Social page of {user}!</p>}
             <div>
-                <h3>Recommended user logs</h3>
+
+                <h1>New followers!</h1>
+                {followerLogs.length === 0 ? (
+                    <p>No workouts recorded yet</p>
+                ) : (
+                    <>
+                        <div className="log-list">
+                            {followerLogs.map((log) => (
+                                <LogItem
+                                    key={log.log_id}
+                                    log={log}
+                                    isEditing={false}
+                                    onReact={handleReact}
+                                    onUnreact={handleUnreact}
+                                    currentUser={user}
+                                    showHeader={true}
+                                />
+                            ))}
+                        </div>
+                    </>
+                )}
+
+                <h1>Recommended user logs</h1>
                 {recLogs.length === 0 ? (
                     <p>No workouts recorded yet</p>
                 ) : (
@@ -145,7 +194,7 @@ const Social = () => {
                     </>
                 )}
 
-                <h3>Following user logs</h3>
+                <h1>Following user logs</h1>
                 {followLogs.length === 0 ? (
                     <p>No workouts recorded yet</p>
                 ) : (

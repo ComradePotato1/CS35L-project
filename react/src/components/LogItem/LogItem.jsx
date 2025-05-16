@@ -82,7 +82,7 @@ const LogItem = ({
                         <input
                             type="date"
                             name="day"
-                            value={formData.day}
+                            value={formData.day.substring(0,10)}
                             onChange={handleChange}
                             required
                         />
@@ -155,7 +155,7 @@ const LogItem = ({
                         <div className="log-details">
                         {log.post && <p className="log-notes">{log.post}</p>}
                         <div className="log-meta">
-                            <span className="log-date">{log.day}</span>
+                            <span className="log-date">{log.day.split("T")[0]+ " "}</span>
                             <span className="log-time">
                                 Started at: {log.start} • Duration: {formatDuration(log.duration)}
                             </span>
