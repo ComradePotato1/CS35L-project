@@ -9,6 +9,7 @@ import '../../App.css'
 const Register = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const profile = "pic-0";
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
 
@@ -23,7 +24,7 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5001/register', { username, password });
+            await axios.post('http://localhost:5001/register', { username, password, profile });
             alert("user created");
             navigate("/login")     
 

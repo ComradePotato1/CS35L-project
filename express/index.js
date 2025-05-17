@@ -28,7 +28,7 @@ const pool = mysql.createPool({
 });
 
 pool.query(`USE ${process.env.DB_NAME}`);
-pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), weight SMALLINT(15), height SMALLINT(15), dailyGoal BOOLEAN, weeklyGoal BOOLEAN )");
+pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), profile VARCHAR(255), weight SMALLINT(15), height SMALLINT(15), dailyGoal BOOLEAN, weeklyGoal BOOLEAN )");
 pool.query(`CREATE TABLE IF NOT EXISTS log (log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME, duration INT, post VARCHAR(255))`); 
 pool.query("CREATE TABLE IF NOT EXISTS react ( log_id INT, username VARCHAR(255) )");
 pool.query("CREATE TABLE IF NOT EXISTS follow ( follower VARCHAR(255) , followee VARCHAR(255) )");
@@ -41,6 +41,7 @@ app.get('/test', async (req, res) => {
 app.post('/register', async (req, res) => {
     try {
         const { username, password } = req.body;
+        const profile = "pic-0"
         //const hashedPassword = await bcrypt.hash(password, 10);
         //suspend hashing passwords for simplicity?
 
@@ -54,8 +55,8 @@ app.post('/register', async (req, res) => {
         }
 
         const [result] = await pool.execute(
-            'INSERT INTO users (username, password) VALUES (?, ?)',
-            [username, password]
+            'INSERT INTO users (username, password, profile) VALUES (?, ?, ?)',
+            [username, password, profile]
             //[username, hashedPassword]
         );
 
@@ -117,10 +118,10 @@ app.post('/change-password', async (req, res) => {
 
 app.post('/update-profile', async (req, res) => {
     try {
-        const { username, name, weight, height, dailyGoal, weeklyGoal } = req.body;
+        const { username, name, profile, weight, height, dailyGoal, weeklyGoal } = req.body;
         await pool.execute(
-            'UPDATE users SET name = ?, weight = ?, height = ?, dailyGoal = ?, weeklyGoal = ? WHERE username = ?',
-            [name, weight, height, dailyGoal, weeklyGoal, username]
+            'UPDATE users SET name = ?, profile = ?, weight = ?, height = ?, dailyGoal = ?, weeklyGoal = ? WHERE username = ?',
+            [name, profile, weight, height, dailyGoal, weeklyGoal, username]
         );
 
         res.json({ message: 'Update successful' });

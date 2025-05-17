@@ -1,6 +1,6 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { AuthContext } from "../auth/auth.js"
-
+import axios from "axios"
 
 const LogItem = ({
     log,
@@ -15,14 +15,15 @@ const LogItem = ({
 }) => {
 
     const { user } = useContext(AuthContext);
-
+    const [name, setName] = useState("");
+    const [profile, setProfile] = useState("");
 
     const [formData, setFormData] = useState({
         username: log.username,
-        activity: log.activity || '',
+        activity: log.activity,
         day: log.day ? log.day.split('T')[0] : '', // format for date input
-        start: log.start || '',
-        duration: log.duration || 30, // Default to 30 minutes
+        start: log.start,
+        duration: log.duration,
         post: log.post || ''
     });
 
@@ -49,12 +50,22 @@ const LogItem = ({
         }
     };
 
+    const fetchUserData = async (username) => {
+        const res = await axios.post('http://localhost:5001/get-userinfo', { username: log.username });
+        setName(res.data.rows[0].name);
+        setProfile(res.data.rows[0].profile);
+    }
+
     // Helper to format duration for display
     const formatDuration = (minutes) => {
         const hours = Math.floor(minutes / 60);
         const mins = minutes % 60;
         return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
     };
+
+    useEffect (() => {
+       fetchUserData(); 
+    })
 
     return (
         <div className={`log-item ${isEditing ? 'editing' : ''}`}>
@@ -141,7 +152,10 @@ const LogItem = ({
                 // View Mode
                     <>
                         {showHeader ? (
-                            <div classname="log-username">post made by <a href={ "/user/" + log.username }>{log.username}</a></div>
+                            <>
+                            <img src={"/images/profile/" + profile + ".png"} alt="Profile" style={{ width: "50px", borderRadius: '50%' }}/>
+                            <div classname="log-username">post made by <a href={ "/user/" + log.username }>{log.username}</a>, name {name}</div>
+                            </>
                         ) : (
                             <></>
                         ) }

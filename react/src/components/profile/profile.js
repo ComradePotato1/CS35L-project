@@ -10,13 +10,16 @@ const Profile = () => {
   const [info, setInfo] = useState({
     username: '',
     name: '',
+    profile: '',
     weight: '',
     height: '',
     dailyGoal: false,
     weeklyGoal: false
   });
   const [editing, setEditing] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  //const [isOpen, setIsOpen] = useState(false);
+  const profileOptions = ['pic-0', 'pic-1', 'pic-2', 'pic-3'];
 
   // follower/following state
   const [followersList, setFollowersList] = useState([]);
@@ -33,6 +36,7 @@ const Profile = () => {
         console.error('Cannot load profile:', err.response?.data || err);
         setError('Cannot load Profile');
       }
+      
     }
     fetchProfile();
 
@@ -68,11 +72,22 @@ const Profile = () => {
     setError('');
   };
 
+  /*const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };*/
+
+  const handleProfileSelect = (n) => {
+    setInfo(prev => ({
+      ...prev,
+      profile: n}));
+  };
+  
   const handleSaveEdits = async () => {
     try {
       await axios.post('http://localhost:5001/update-profile', {
         username:   user,
         name:       info.name,
+        profile:    info.profile,
         weight:     info.weight,
         height:     info.height,
         dailyGoal:  info.dailyGoal,
@@ -94,12 +109,23 @@ const Profile = () => {
       <div className={editing ? 'profilepage editing' : 'profilepage'}>
         <h2>Your Profile</h2>
 
-        {/* default profile pic preview */}
-        <div className="profilepicpreview">
-          <img src="/images/icons/workout.svg" alt="Profile" />
+        <div className="profilepicpreview" style={{ cursor: 'pointer' }}> {/* onClick={toggleDropdown} */}
+          <img src={"/images/profile/" + info.profile + ".png"} alt="Profile" style={{ borderRadius: '50%' }}/>
         </div>
 
-        {error && <p className="errors">{error}</p>}
+        {editing && (
+          <div className="profile-dropdown-menu">
+            {profileOptions.map((profile) => (
+              <img
+                key={profile}
+                src={`/images/profile/${profile}.png`}
+                alt={`Profile ${profile}`}
+                style={{width: '50px', borderRadius: '50%', cursor: 'pointer', margin: '10px', border: info.profile === profile ? '2px solid #4499cc' : 'none'}}
+                onClick={() => handleProfileSelect(profile)}
+              />
+            ))}
+          </div>
+        )}
 
         <button className="editbutton" onClick={() => setEditing(!editing)}>
           {editing ? 'Cancel' : 'Edit'}

@@ -152,11 +152,12 @@ const Social = () => {
             {user && <p>Social page of {user}!</p>}
             <div>
 
-                <h1>New followers!</h1>
+                
                 {followerLogs.length === 0 ? (
-                    <p>No workouts recorded yet</p>
+                    <></>
                 ) : (
                     <>
+                    <h1>New followers!</h1>
                         <div className="log-list">
                             {followerLogs.map((log) => (
                                 <LogItem
