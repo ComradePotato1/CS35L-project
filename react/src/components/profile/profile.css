@@ -1,101 +1,113 @@
 :root {
-    --stanwidth: 15rem;
-    --stanheight: 3rem;
-    --largefontsize: 1rem;
-    --stanbradius: 0.5rem;
-    --stanshadow: 0px 4px 6px rgba(0, 0, 0, 0.08);
-    --buttonback: #4499cc;
-    --buttonshadow: 0px 4px 6px rgba(0, 0, 0, 0.05);
-    --gap: 1rem;
+  --stanwidth: 15rem;
+  --stanheight: 3rem;
+  --largefontsize: 1rem;
+  --stanbradius: 0.5rem;
+  --stanshadow: 0px 4px 6px rgba(0, 0, 0, 0.08);
+  --buttonback: #4499cc;
+  --buttonshadow: 0px 4px 6px rgba(0, 0, 0, 0.05);
+  --gap: 1rem;
 }
 
-.profile-page {
-    max-width: 40rem;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: #f9f9f9;
-    border-radius: var(--stanbradius);
-    box-shadow: var(--stanshadow);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap);
+.profilepage {
+  max-width: 40rem;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #f9f9f9;
+  border-radius: var(--stanbradius);
+  box-shadow: var(--stanshadow);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
 }
 
-.profile-page h2 {
-    text-align: center;
-    margin: 0;
+.profilepage h2 {
+  text-align: center;
+  margin: 0;
 }
 
 .errors {
-    color: red;
-    text-align: center;
+  color: red;
+  text-align: center;
+}
+
+.profilepicpreview {
+  text-align: center;
+  margin-bottom: var(--gap);
+}
+.profilepicpreview img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--buttonback);
 }
 
 .profile {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .tag {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .val {
-    font-family: monospace;
+  font-family: monospace;
 }
 
 .profile input[type="text"],
 .profile input[type="number"] {
-    width: var(--stanwidth);
-    height: var(--stanheight);
-    font-size: var(--largefontsize);
-    padding: 0 0.5rem;
-    border: none;
-    border-radius: var(--stanbradius);
-    box-shadow: var(--stanshadow);
+  width: var(--stanwidth);
+  height: var(--stanheight);
+  font-size: var(--largefontsize);
+  padding: 0 0.5rem;
+  border: none;
+  border-radius: var(--stanbradius);
+  box-shadow: var(--stanshadow);
 }
 
 .profile input[type="checkbox"] {
-    transform: scale(1.2);
+  transform: scale(1.2);
 }
 
-.edit-button,
-.save-button {
-    position: absolute;
-    top: var(--gap);
-    font-family: monospace;
-    padding: 0.5rem 1rem;
-    background: var(--buttonback);
-    color: #fff;
-    border: none;
-    border-radius: var(--stanbradius);
-    cursor: pointer;
-    box-shadow: var(--buttonshadow);
+.editbutton,
+.savebutton {
+  position: absolute;
+  top: var(--gap);
+  font-family: monospace;
+  padding: 0.5rem 1rem;
+  background: var(--buttonback);
+  color: #fff;
+  border: none;
+  border-radius: var(--stanbradius);
+  cursor: pointer;
+  box-shadow: var(--buttonshadow);
 }
 
-.edit-button {
-    right: var(--gap);
+.editbutton {
+  right: var(--gap);
 }
 
-.profile-page.editing .edit-button {
-    right: auto;
-    left: var(--gap);
+.profilepage.editing .editbutton {
+  left: var(--gap);
+  right: auto;
 }
 
-.save-button {
-    right: var(--gap);
+.savebutton {
+  right: var(--gap);
 }
 
 @media (max-width: 600px) {
-    .profile {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    .profile input {
-        width: 100%;
-    }
+  .profile {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .profile input {
+    width: 100%;
+  }
 }
 
 .logout {
@@ -103,7 +115,41 @@
   text-align: center;
   display: block;
   color: var(--buttonback);
-  text-decoration: none;
-  font-weight: bold;
   text-decoration: underline;
+  font-weight: bold;
+}
+
+/* followers & following layout */
+.followsection {
+  display: flex;
+  gap: var(--gap);
+  margin-top: var(--gap);
+}
+.followersbox,
+.followingbox {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--stanbradius);
+  padding: var(--gap);
+}
+.followersbox h3,
+.followingbox h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+.followersbox ul,
+.followingbox ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.followersbox li,
+.followingbox li {
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #ddd;
+}
+.followersbox li:last-child,
+.followingbox li:last-child {
+  border-bottom: none;
 }

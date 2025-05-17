@@ -103,4 +103,24 @@
       width: 100%;
     }
   }
-  
+  .pastworkouts {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 0.5rem;
+}
+.pastworkouts h3 {
+  margin-bottom: 0.5rem;
+}
+.pastwork {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.pastitem {
+  padding: 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+.pastitem:last-child {
+  border-bottom: none;
+}

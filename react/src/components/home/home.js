@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import './home.css'
 import '../../App.css';
@@ -19,6 +19,25 @@ const Home = () => {
   const [post, setPost] = useState('');
   const [error, setError] = useState('');
   const [icon, setIcon] = useState('/images/icons/workout.svg');
+  const [pastWorkouts, setPastWorkouts] = useState([]);
+
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    const pastArray = async() => {
+      try {
+        const {data} = await axios.post('http://localhost:5001/get-log', {username: [user], range_start: 0, range_end: 3});
+        console.log('home recent logs:', data.combined);
+        setPastWorkouts(data.combined || []);
+      } catch (error){
+        console.error('No workouts found',error);
+      }
+    }
+    pastArray();
+  }, [user]);
+
 
   function changeIcon(text) {
     const lower = text.toLowerCase();
@@ -161,6 +180,22 @@ const Home = () => {
 
           <button type="submit">Submit Workout</button>
         </form>
+      </section>
+
+      <section className="pastworkouts">
+        <h3>
+          Past Workouts
+        </h3>
+        {pastWorkouts.length === 0 ? (
+          <p>No recent workouts</p>): (
+          <div className="pastwork">
+            {pastWorkouts.map(log => (
+              <div key={log.log_id} className="pastitem">
+                <strong>{log.activity}</strong> on {log.day} at {log.start} for {log.duration} min
+              </div>
+            ))}
+          </div>
+          )}
       </section>
     </div>
   );
