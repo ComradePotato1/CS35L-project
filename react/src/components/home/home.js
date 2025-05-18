@@ -100,6 +100,11 @@ const Home = () => {
         post
       });
 
+      await axios.post('http://localhost:5001/add-stats', {
+        username: user,
+        activity,
+      });
+      
 
       setActivity('');
       setDay(today); //default to todays date, should prob make end date to length of workout.

@@ -3,6 +3,7 @@ import axios from 'axios';
 import LogItem from '../LogItem/LogItem.jsx';
 import { AuthContext } from "../auth/auth";
 import '../../App.css';
+import {Radar, RadarChart,PolarGrid,PolarAngleAxis,PolarRadiusAxis } from 'recharts';
 
 const History = () => {
   const { user } = useContext(AuthContext);
@@ -10,6 +11,7 @@ const History = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [editingLogId, setEditingLogId] = useState(null);
+  const [data, setData] = useState([]);
   const ITEMS_PER_PAGE = 7;
 
   // Fetch logs from backend
@@ -32,6 +34,7 @@ const History = () => {
   useEffect(() => {
     if (user) {
       fetchLogs();
+      getStats();
     }
   }, [user, page]);
 
@@ -86,6 +89,54 @@ const handleUnreact = async (logId) => {
     }
 };
 
+const getStats = async () => {
+  try {
+      let stat = await axios.post('http://localhost:5001/get-stats', {
+          username: user,
+      });
+      stat = stat.data.result;
+      const sum = stat.aerobic + stat.stretching + stat.strengthening + stat.balance + stat.rest + stat.other
+    setData([
+      {
+        activity: "Aerobic",
+        A: (stat.aerobic / sum * 100),
+        fullMark: 100,
+      },
+      {
+        activity: "Stretching",
+        A: (stat.stretching / sum * 100),
+        fullMark: 100,
+      },
+      {
+        activity: "Strengthening",
+        A: (stat.strengthening / sum * 100),
+        fullMark: 100,
+      },
+      {
+        activity: "Balance",
+        A: (stat.balance/ sum * 100),
+        fullMark: 100,
+      },
+      {
+        activity: "Rest",
+        A: (stat.rest / sum * 100),
+        fullMark: 100,
+      },
+      {
+        activity: "Other",
+        A: (stat.other / sum * 100),
+        fullMark: 100,
+      },
+    ]);
+    
+    } catch (err) {
+      alert('failed');
+        console.error("get failed:", err);
+    }
+}
+//source = https://www.health.harvard.edu/exercise-and-fitness/the-4-most-important-types-of-exercise
+//example https://codesandbox.io/p/sandbox/simple-radar-chart-2p5sxm
+
 
   if (!user) return <p>Please log in to view history</p>;
   if (loading) return <div className="loading">Loading...</div>;
@@ -93,7 +144,27 @@ const handleUnreact = async (logId) => {
   return (
     <div className="history-container">
       <h2>Your Workout History</h2>
-      
+      <RadarChart
+        cx={300}
+        cy={250}
+        outerRadius={150}
+        width={700}
+        height={500}
+        data={data}
+        style={{marginLeft:"auto"}}
+        
+      >
+        <PolarGrid stroke="#111" />
+        <PolarAngleAxis dataKey="activity" />
+        <PolarRadiusAxis type="number" domain={[0,100]}/>
+        <Radar
+          name={user}
+          dataKey="A"
+          stroke="#55aadd"
+          fill="#4499cc"
+          fillOpacity={0.6}
+        />
+    </RadarChart>
       {logs.length === 0 ? (
         <p>No workouts recorded yet</p>
       ) : (

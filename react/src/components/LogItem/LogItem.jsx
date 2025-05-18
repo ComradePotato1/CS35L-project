@@ -14,7 +14,7 @@ const LogItem = ({
     showHeader=false
 }) => {
 
-    const { user } = useContext(AuthContext);
+    
     const [name, setName] = useState("");
     const [profile, setProfile] = useState("");
     const [icon, setIcon] = useState("/images/icons/workout.svg")
@@ -79,7 +79,7 @@ const LogItem = ({
         } else if (lower.includes("swim") || lower.includes("swam") ||  lower.includes("water")) {
         setIcon('/images/icons/swimming.svg');
         } else if (lower.includes('bik') || lower.includes('cycl')) {
-        setIcon('/images/icons/cycle.webp');
+        setIcon('/images/icons/cycle.png');
         } else if (lower.includes('box')) {
         setIcon('/images/icons/boxing.svg');
         } else if (lower.includes('yoga')) {

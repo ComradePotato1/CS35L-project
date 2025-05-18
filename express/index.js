@@ -29,6 +29,7 @@ const pool = mysql.createPool({
 
 pool.query(`USE ${process.env.DB_NAME}`);
 pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), profile VARCHAR(255), weight SMALLINT(15), height SMALLINT(15), dailyGoal BOOLEAN, weeklyGoal BOOLEAN )");
+pool.query("CREATE TABLE IF NOT EXISTS stats ( username VARCHAR (255), aerobic SMALLINT(15) DEFAULT 0, stretching SMALLINT(15) DEFAULT 0 , strengthening SMALLINT(15) DEFAULT 0, balance SMALLINT(15) DEFAULT 0, rest SMALLINT(15) DEFAULT 0 , other SMALLINT(15) DEFAULT 0 )");
 pool.query(`CREATE TABLE IF NOT EXISTS log (log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME, duration INT, post VARCHAR(255))`); 
 pool.query("CREATE TABLE IF NOT EXISTS react ( log_id INT, username VARCHAR(255) )");
 pool.query("CREATE TABLE IF NOT EXISTS follow ( follower VARCHAR(255) , followee VARCHAR(255) )");
@@ -59,6 +60,8 @@ app.post('/register', async (req, res) => {
             [username, password, profile]
             //[username, hashedPassword]
         );
+
+        await pool.execute('INSERT INTO stats (username) VALUES ?', [username]);
 
         res.status(200).json({ message: 'User created' });
     } catch (error) {
@@ -226,6 +229,75 @@ app.post('/get-log', async (req, res) => {
     }
 });
 
+app.post('/refresh-stats', async (req, res) => {
+    try {
+      await pool.execute("DELETE FROM stats");
+      await pool.execute('INSERT INTO stats (username) SELECT username FROM users');
+      const [result] = await pool.execute("SELECT * FROM log");
+      for (let i = 0; i < result.length; i++) {
+        const lower = result[i].activity.toLowerCase();
+        if (lower.includes("run") || lower.includes('ran')) {
+            await pool.execute("UPDATE stats SET aerobic = aerobic+1 WHERE username = ?", 
+            [result[i].username]
+            );
+        } else if (lower.includes("yoga")) {
+            await pool.execute("UPDATE stats SET balance = balance+1 WHERE username = ?", 
+            [result[i].username]
+            );
+        } 
+        
+        else {
+            await pool.execute("UPDATE stats SET other = other+1 WHERE username = ?", 
+            [result[i].username]
+            );
+        }
+      }
+      res.status(200).json({ message: "refresh success" });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/add-stats', async(req, res) => {
+    try {
+        const { username, activity } = req.body;
+        const lower = activity.toLowerCase();
+        if (lower.includes("run") || lower.includes('ran')) {
+            await pool.execute("UPDATE stats SET aerobic = aerobic+1 WHERE username = ?", 
+            [username]
+            );
+        } else if (lower.includes("yoga")) {
+            await pool.execute("UPDATE stats SET balance = balance+1 WHERE username = ?", 
+            [username]
+            );
+        } else {
+            await pool.execute("UPDATE stats SET other = other+1 WHERE username = ?", 
+            [username]
+            );
+        }
+        res.status(200).json({ message: "add success" });
+    } catch (error) {
+        res.status(500).json({error: error.message});
+    }
+})
+
+app.post('/get-stats', async (req, res) => {
+    try {
+      const { username } = req.body;
+
+      const [rows] = await pool.execute(
+          'SELECT * FROM stats WHERE username = ?',
+          [username]
+      );
+      const result = rows[0]
+      res.status(200).json({ result });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+});
+
+
+
 app.post('/react', async (req, res) => {
     try {
         const { log_id, username } = req.body;
@@ -304,58 +376,6 @@ app.post('/follow', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-/* implement follow requests? 
-app.post('/get-request', async (req, res) => {
-    try {
-        const { username } = req.body;
-
-        [rows] = await pool.execute(
-            'SELECT * FROM request where followee = ?',
-            [username]
-        );
-
-
-        res.status(200).json({ rows });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.post('/approve-follow', async (req, res) => {
-    try {
-        const { follower, followee } = req.body;
-
-        await pool.execute(
-            'delete from request where follower = ? and followee = ?',
-            [follower, followee]
-        );
-        await pool.execute(
-            'insert into follow (follower, followee) values (?, ?)',
-            [follower, followee]
-        );
-        
-
-
-        res.status(200).json({ message: 'Follow successful' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.post('/reject-follow', async (req, res) => {
-    try {
-        const { follower, followee } = req.body;
-
-        await pool.execute(
-            'delete from request where follower = ? and followee = ?',
-            [follower, followee]
-        );
-
-        res.status(200).json({ message: 'reject successful' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});*/
 
 //note - follower is the one requesting to follow and followee is the one being followed
 app.post('/get-follower', async (req, res) => {
