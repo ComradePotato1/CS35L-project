@@ -18,6 +18,7 @@ const Profile = () => {
   });
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
+  const [toggleFollower, setToggleFollower] = useState(true) 
   //const [isOpen, setIsOpen] = useState(false);
   const profileOptions = ['pic-0', 'pic-1', 'pic-2', 'pic-3'];
 
@@ -42,7 +43,7 @@ const Profile = () => {
 
     const getFollowers = async () => {
       try {
-        const res = await axios.post('http://localhost:5001/get-follow-back', { username: user });
+        const res = await axios.post('http://localhost:5001/get-follower', { followee: user });
         setFollowersList(res.data.result || []);
       } catch (err) {
         console.error('Get followers failed:', err);
@@ -58,7 +59,8 @@ const Profile = () => {
     };
     getFollowers();
     getFollowing();
-  }, [user]);
+  }, [user, toggleFollower]);
+
 
   const handleEditing = (param) => (tobj) => {
     const value = tobj.target.value;
@@ -72,9 +74,6 @@ const Profile = () => {
     setError('');
   };
 
-  /*const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };*/
 
   const handleProfileSelect = (n) => {
     setInfo(prev => ({
@@ -214,31 +213,43 @@ const Profile = () => {
 
       {/* followers & following moved outside */}
       <div className="followsection">
-        <div className="followersbox">
-          <h3>Followers</h3>
-          {followersList.length === 0 ? (
-            <p>No followers</p>
-          ) : (
-            <ul>
-              {followersList.map(f => (
-                <li key={f}>{f}</li>
-              ))}
-            </ul>
+        {toggleFollower ? (
+          <div className="followersbox">
+            <div style={{display:"flex", flex:"1 1 100%", flexWarp:"warp"}}>
+              <button onClick={() => setToggleFollower(true)} className="toggleFollowButton" style={{borderBottom:"solid 0.5em #4499cc"}}><h3>Followers</h3></button>
+              <button onClick={() => setToggleFollower(false)} className="toggleFollowButton"><h3>Following</h3></button>
+              </div>
+            
+            {followersList.length === 0 ? (
+              <p>No followers</p>
+            ) : (
+              <ul>
+                {followersList.map(f => (
+                  <li key={f}><a href={"/user/" + f}>{f}</a></li>
+                ))}
+              </ul>
           )}
         </div>
+        ) : (
+          <div className="followingbox">
+            <div style={{display:"flex", flex:"1 1 100%", flexWarp:"warp"}}>
+              <button onClick={() => setToggleFollower(true)} className="toggleFollowButton"><h3>Followers</h3></button>
+              <button onClick={() => setToggleFollower(false)} className="toggleFollowButton" style={{borderBottom:"solid 0.5em #4499cc"}}><h3>Following</h3></button>
+              </div>
+            {followingList.length === 0 ? (
+              <p>Not following anyone</p>
+            ) : (
+              <ul>
+                {followingList.map(f => (
+                  <li key={f}><a href={"/user/" + f}>{f}</a></li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+        
 
-        <div className="followingbox">
-          <h3>Following</h3>
-          {followingList.length === 0 ? (
-            <p>Not following anyone</p>
-          ) : (
-            <ul>
-              {followingList.map(f => (
-                <li key={f}>{f}</li>
-              ))}
-            </ul>
-          )}
-        </div>
+        
       </div>
     </>
   );

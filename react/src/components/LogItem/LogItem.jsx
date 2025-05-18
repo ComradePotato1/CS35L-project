@@ -17,6 +17,7 @@ const LogItem = ({
     const { user } = useContext(AuthContext);
     const [name, setName] = useState("");
     const [profile, setProfile] = useState("");
+    const [icon, setIcon] = useState("/images/icons/workout.svg")
 
     const [formData, setFormData] = useState({
         username: log.username,
@@ -64,8 +65,39 @@ const LogItem = ({
     };
 
     useEffect (() => {
+        
        fetchUserData(); 
+       changeIcon();
     })
+
+    function changeIcon() {
+        const lower = log.activity.toLowerCase();
+        if (lower.includes("run") || lower.includes('ran')) {
+        setIcon('/images/icons/running.svg');
+        } else if (lower.includes("lift") || lower.includes("weight")) {
+        setIcon('/images/icons/dumbbell.svg');
+        } else if (lower.includes("swim") || lower.includes("swam") ||  lower.includes("water")) {
+        setIcon('/images/icons/swimming.svg');
+        } else if (lower.includes('bik') || lower.includes('cycl')) {
+        setIcon('/images/icons/cycle.webp');
+        } else if (lower.includes('box')) {
+        setIcon('/images/icons/boxing.svg');
+        } else if (lower.includes('yoga')) {
+        setIcon('/images/icons/yoga.svg')
+        } else if (lower.includes('pilate')) {
+            setIcon('/images/icons/pilates.svg')
+        }  else if (lower.includes('hik') || lower.includes('walk')) {
+        setIcon('/images/icons/hiking.png')
+        } else if (lower.includes('meditat') || lower.includes('rest')) {
+        setIcon('/images/icons/meditation.png')
+        } else if (lower.includes('ball')) {
+        setIcon('/images/icons/ball.png')
+        }
+
+        else {
+        setIcon('/images/icons/workout.svg');
+        }
+    }
 
     return (
         <div className={`log-item ${isEditing ? 'editing' : ''}`}>
@@ -161,6 +193,7 @@ const LogItem = ({
                         ) }
                         
                     <div className="log-header">
+                        <img src={icon} alt="icon" style={{width:"50px"}}></img>
                         <h3>{log.activity}</h3>
                         <span className="timestamp">
                             {new Date(log.timestamp).toLocaleString()}

@@ -122,12 +122,16 @@
 /* followers & following layout */
 .followsection {
   display: flex;
+  width: 50%;
+  align-self: center;
   gap: var(--gap);
   margin-top: var(--gap);
+  margin-left: 25%;
+  margin-right: 25%;
 }
 .followersbox,
 .followingbox {
-  flex: 1;
+  flex: 1 1 25%;
   background: #fff;
   border: 1px solid #e0e0e0;
   border-radius: var(--stanbradius);
@@ -152,4 +156,16 @@
 .followersbox li:last-child,
 .followingbox li:last-child {
   border-bottom: none;
+}
+
+.toggleFollowButton {
+  height: 3em;
+  width:100%;
+  background-color: white;
+  border: 0;
+  
+  align-items:center;
+}
+.toggleFollowButton:hover {
+  background-color:#dddddd;
 }

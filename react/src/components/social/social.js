@@ -149,7 +149,6 @@ const Social = () => {
 
     return (
         <div>
-            {user && <p>Social page of {user}!</p>}
             <div>
 
                 

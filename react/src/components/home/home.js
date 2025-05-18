@@ -42,24 +42,30 @@ const Home = () => {
   function changeIcon(text) {
     const lower = text.toLowerCase();
     if (lower.includes("run") || lower.includes('ran')) {
-      setIcon('/images/icons/running.svg');
-    } else if (lower.includes("lift") || lower.includes("weight")) {
-      setIcon('/images/icons/dumbbell.svg');
-    } else if (lower.includes("swim") || lower.includes("swam")) {
-      setIcon('/images/icons/swimming.svg');
-    } else if (lower.includes('bike') || lower.includes('biking')) {
-      setIcon('/images/icons/bike.svg');
-    } else if (lower.includes('box')) {
-      setIcon('/images/icons/boxing.svg');
-    } else if (lower.includes('yoga')) {
-      setIcon('/images/icons/yoga.svg')
-    } else if (lower.includes('pilate')) {
-        setIcon('/images/icons/pilates.svg')
-    }
+        setIcon('/images/icons/running.svg');
+        } else if (lower.includes("lift") || lower.includes("weight")) {
+        setIcon('/images/icons/dumbbell.svg');
+        } else if (lower.includes("swim") || lower.includes("swam") ||  lower.includes("water")) {
+        setIcon('/images/icons/swimming.svg');
+        } else if (lower.includes('bik') || lower.includes('cycl')) {
+        setIcon('/images/icons/cycle.webp');
+        } else if (lower.includes('box')) {
+        setIcon('/images/icons/boxing.svg');
+        } else if (lower.includes('yoga')) {
+        setIcon('/images/icons/yoga.svg')
+        } else if (lower.includes('pilate')) {
+            setIcon('/images/icons/pilates.svg')
+        }  else if (lower.includes('hik') || lower.includes('walk')) {
+        setIcon('/images/icons/hiking.png')
+        } else if (lower.includes('meditat') || lower.includes('rest')) {
+        setIcon('/images/icons/meditation.png')
+        } else if (lower.includes('ball')) {
+        setIcon('/images/icons/ball.png')
+        }
 
-    else {
-      setIcon('/images/icons/workout.svg');
-    }
+        else {
+        setIcon('/images/icons/workout.svg');
+        }
     }
 
     const autoUpdateStart = (e) => {
@@ -115,7 +121,7 @@ const Home = () => {
   return (
     <div className="page">
       <h2>Welcome back, {user}!</h2>
-      <img src={icon} alt="icon" className="hicon" />
+      <img src={icon} alt="icon" className="home-icon" />
 
       <section className="workout">
         <h3>Add a Workout</h3>
