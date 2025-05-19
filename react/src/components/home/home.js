@@ -102,7 +102,8 @@ const Home = () => {
 
       await axios.post('http://localhost:5001/add-stats', {
         username: user,
-        activity,
+          activity,
+            duration,
       });
       
 

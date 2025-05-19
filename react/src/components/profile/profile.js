@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import delay from 'delay';
 import '../../App.css';
 import { Link } from 'react-router-dom';
 import './profile.css';
@@ -92,7 +93,11 @@ const Profile = () => {
         dailyGoal:  info.dailyGoal,
         weeklyGoal: info.weeklyGoal
       });
-      setEditing(false);
+        setEditing(false);
+        const popup = document.getElementById('popup');
+        popup.style.display = "flex";
+        await delay(5000);
+        popup.style.display = "none";
     } catch (err) {
       console.error('Could not update profile', err.response);
       setError('Could not update Profile');
@@ -104,8 +109,11 @@ const Profile = () => {
   }
 
   return (
-    <>
-      <div className={editing ? 'profilepage editing' : 'profilepage'}>
+      <>
+          <div class="popup" id="popup"><span class="popuptext">Edit Profile Success!</span></div>
+
+          <div className={editing ? 'profilepage editing' : 'profilepage'}>
+              
         <h2>Your Profile</h2>
 
         <div className="profilepicpreview" style={{ cursor: 'pointer' }}> {/* onClick={toggleDropdown} */}

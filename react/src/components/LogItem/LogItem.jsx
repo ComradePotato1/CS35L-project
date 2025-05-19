@@ -79,7 +79,7 @@ const LogItem = ({
         } else if (lower.includes("swim") || lower.includes("swam") ||  lower.includes("water")) {
         setIcon('/images/icons/swimming.svg');
         } else if (lower.includes('bik') || lower.includes('cycl')) {
-        setIcon('/images/icons/cycle.png');
+        setIcon('/images/icons/cycle.webp');
         } else if (lower.includes('box')) {
         setIcon('/images/icons/boxing.svg');
         } else if (lower.includes('yoga')) {
@@ -106,18 +106,18 @@ const LogItem = ({
                 <form onSubmit={handleSubmit} className="edit-form">
                     <div className="form-group">
                         <label>Activity:</label>
-                        <select
+                        <input
                             name="activity"
                             value={formData.activity}
                             onChange={handleChange}
                             required
                         >
-                            <option value="">Select activity</option>
+                            {/*<option value="">Select activity</option>
                             <option value="Running">Running</option>
                             <option value="Cycling">Cycling</option>
                             <option value="Swimming">Swimming</option>
-                            <option value="Weight Training">Weight Training</option>
-                        </select>
+                            <option value="Weight Training">Weight Training</option>*/}
+                        </input>
                     </div>
 
                     <div className="form-group">

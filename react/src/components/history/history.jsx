@@ -130,7 +130,6 @@ const getStats = async () => {
     ]);
     
     } catch (err) {
-      alert('failed');
         console.error("get failed:", err);
     }
 }
@@ -156,13 +155,14 @@ const getStats = async () => {
       >
         <PolarGrid stroke="#111" />
         <PolarAngleAxis dataKey="activity" />
-        <PolarRadiusAxis type="number" domain={[0,100]}/>
+        <PolarRadiusAxis type="number" domain={[0,100]} />
         <Radar
           name={user}
           dataKey="A"
           stroke="#55aadd"
           fill="#4499cc"
-          fillOpacity={0.6}
+                  fillOpacity={0.6}
+                  strokeWidth="3.5"
         />
     </RadarChart>
       {logs.length === 0 ? (

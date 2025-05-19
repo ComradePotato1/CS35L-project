@@ -169,3 +169,36 @@
 .toggleFollowButton:hover {
   background-color:#dddddd;
 }
+
+.popup {
+    position: absolute;
+    margin-right: 10%;
+    display: none;
+    margin-left: 40%;
+    cursor: default;
+    animation: fadeIn 5s 1;
+}
+
+    .popup .popuptext {
+        width: 20em;
+        background-color: #4499cc;
+        color: #fff;
+        text-align: center;
+        border-radius: 10px;
+        padding: 20px 0;
+        position: absolute;
+        bottom: 100%;
+    }
+
+@keyframes fadeIn {
+    0%, 100% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+    75% {
+        opacity: 0.9;
+    }
+}

@@ -28,7 +28,7 @@ const pool = mysql.createPool({
 });
 
 pool.query(`USE ${process.env.DB_NAME}`);
-pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), profile VARCHAR(255), weight SMALLINT(15), height SMALLINT(15), dailyGoal BOOLEAN, weeklyGoal BOOLEAN )");
+pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), profile VARCHAR(255) DEFAULT 'pic-0', weight SMALLINT(15), height SMALLINT(15), dailyGoal BOOLEAN, weeklyGoal BOOLEAN )");
 pool.query("CREATE TABLE IF NOT EXISTS stats ( username VARCHAR (255), aerobic SMALLINT(15) DEFAULT 0, stretching SMALLINT(15) DEFAULT 0 , strengthening SMALLINT(15) DEFAULT 0, balance SMALLINT(15) DEFAULT 0, rest SMALLINT(15) DEFAULT 0 , other SMALLINT(15) DEFAULT 0 )");
 pool.query(`CREATE TABLE IF NOT EXISTS log (log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME, duration INT, post VARCHAR(255))`); 
 pool.query("CREATE TABLE IF NOT EXISTS react ( log_id INT, username VARCHAR(255) )");
@@ -61,7 +61,9 @@ app.post('/register', async (req, res) => {
             //[username, hashedPassword]
         );
 
-        await pool.execute('INSERT INTO stats (username) VALUES ?', [username]);
+        await pool.execute('INSERT INTO stats (username) VALUES (?)',
+            [username]
+        );
 
         res.status(200).json({ message: 'User created' });
     } catch (error) {
@@ -237,18 +239,18 @@ app.post('/refresh-stats', async (req, res) => {
       for (let i = 0; i < result.length; i++) {
         const lower = result[i].activity.toLowerCase();
         if (lower.includes("run") || lower.includes('ran')) {
-            await pool.execute("UPDATE stats SET aerobic = aerobic+1 WHERE username = ?", 
-            [result[i].username]
+            await pool.execute("UPDATE stats SET aerobic = aerobic+ ? WHERE username = ?", 
+            [result[i].duration, result[i].username]
             );
         } else if (lower.includes("yoga")) {
-            await pool.execute("UPDATE stats SET balance = balance+1 WHERE username = ?", 
-            [result[i].username]
+            await pool.execute("UPDATE stats SET balance = balance+ ? WHERE username = ?", 
+            [result[i].duration, result[i].username]
             );
         } 
         
         else {
-            await pool.execute("UPDATE stats SET other = other+1 WHERE username = ?", 
-            [result[i].username]
+            await pool.execute("UPDATE stats SET other = other+ ? WHERE username = ?", 
+            [result[i].duration, result[i].username]
             );
         }
       }
@@ -260,19 +262,19 @@ app.post('/refresh-stats', async (req, res) => {
 
 app.post('/add-stats', async(req, res) => {
     try {
-        const { username, activity } = req.body;
+        const { username, activity, duration} = req.body;
         const lower = activity.toLowerCase();
         if (lower.includes("run") || lower.includes('ran')) {
-            await pool.execute("UPDATE stats SET aerobic = aerobic+1 WHERE username = ?", 
-            [username]
+            await pool.execute("UPDATE stats SET aerobic = aerobic+ ? WHERE username = ?", 
+            [duration, username]
             );
         } else if (lower.includes("yoga")) {
-            await pool.execute("UPDATE stats SET balance = balance+1 WHERE username = ?", 
-            [username]
+            await pool.execute("UPDATE stats SET balance = balance+ ? WHERE username = ?", 
+            [duration, username]
             );
         } else {
-            await pool.execute("UPDATE stats SET other = other+1 WHERE username = ?", 
-            [username]
+            await pool.execute("UPDATE stats SET other = other+ ? WHERE username = ?", 
+            [duration, username]
             );
         }
         res.status(200).json({ message: "add success" });
