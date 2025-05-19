@@ -155,7 +155,7 @@ const getStats = async () => {
       >
         <PolarGrid stroke="#111" />
         <PolarAngleAxis dataKey="activity" />
-        <PolarRadiusAxis type="number" domain={[0,100]} />
+        <PolarRadiusAxis type="number" domain={[-10,100]} />
         <Radar
           name={user}
           dataKey="A"

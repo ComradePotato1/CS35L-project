@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate} from 'react-router-dom';
 import { AuthContext } from './auth.js';
+import delay from 'delay';
 
 import './login.css'
 import '../../App.css'
@@ -25,8 +26,12 @@ const Register = () => {
         e.preventDefault();
         try {
             await axios.post('http://localhost:5001/register', { username, password, profile });
-            alert("user created");
-            navigate("/login")     
+            const popup = document.getElementById('popup');
+            popup.style.display = "flex";
+            await delay(2500);
+            navigate("/login") 
+            
+                
 
         } catch (error) {
             alert(error.response?.data?.error || 'Registration failed');
@@ -36,6 +41,7 @@ const Register = () => {
     return (
         <div className="login-background">
             <div className="login-page">
+                <div class="popup" id="popup"><span class="popuptext">New user created! Redirecting</span></div>
                 <div style={{ height: "10vh" }} />
                 <div className="login-text">
                     Register

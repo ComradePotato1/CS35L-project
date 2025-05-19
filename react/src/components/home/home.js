@@ -3,6 +3,7 @@ import axios from 'axios';
 import './home.css'
 import '../../App.css';
 import { AuthContext } from "../auth/auth.js";
+import delay from 'delay';
 
 const Home = () => {
   const { user } = useContext(AuthContext);
@@ -105,7 +106,10 @@ const Home = () => {
           activity,
             duration,
       });
-      
+        const popup = document.getElementById('popup');
+        popup.style.display = "flex";
+        await delay(1900);
+        popup.style.display = "none";
 
       setActivity('');
       setDay(today); //default to todays date, should prob make end date to length of workout.
@@ -125,7 +129,8 @@ const Home = () => {
   }
 
   return (
-    <div className="page">
+      <div className="page">
+          <div class="popup-home" id="popup"><span class="popuptext">Workout Logged!</span></div>
       <h2>Welcome back, {user}!</h2>
       <img src={icon} alt="icon" className="home-icon" />
 

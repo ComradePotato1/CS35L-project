@@ -110,8 +110,7 @@ const Profile = () => {
 
   return (
       <>
-          <div class="popup" id="popup"><span class="popuptext">Edit Profile Success!</span></div>
-
+            <div class="popup" id="popup"><span class="popuptext">Edit Profile Success!</span></div>
           <div className={editing ? 'profilepage editing' : 'profilepage'}>
               
         <h2>Your Profile</h2>
@@ -224,9 +223,9 @@ const Profile = () => {
         {toggleFollower ? (
           <div className="followersbox">
             <div style={{display:"flex", flex:"1 1 100%", flexWarp:"warp"}}>
-              <button onClick={() => setToggleFollower(true)} className="toggleFollowButton" style={{borderBottom:"solid 0.5em #4499cc"}}><h3>Followers</h3></button>
+              <button onClick={() => setToggleFollower(true)} className="toggleFollowButton" style={{borderBottom:"solid 0.5em #4499cc", }}><h3>Followers</h3></button>
               <button onClick={() => setToggleFollower(false)} className="toggleFollowButton"><h3>Following</h3></button>
-              </div>
+            </div>
             
             {followersList.length === 0 ? (
               <p>No followers</p>
