@@ -104,13 +104,43 @@ const Profile = () => {
     }
   };
 
+    const changeToggleFollower = async (b) => {
+        try {
+            const follow = document.getElementById('follow');
+            const followerButton = document.getElementById('followerButton');
+            const followingButton = document.getElementById('followingButton');
+            //performance issues
+
+            if (b === toggleFollower) {
+
+            } else if (b) {
+                followerButton.style.borderBottom = "solid 0.5em #4499cc"
+                followingButton.style.borderBottom = "solid 0.5em transparent"
+                follow.style.animationDirection = "normal"
+                follow.style.animation = "swipe-right 0.2s 1"
+                await delay(190);
+                await setToggleFollower(b);
+            } else {
+                followingButton.style.borderBottom = "solid 0.5em #4499cc"
+                followerButton.style.borderBottom = "solid 0.5em transparent"
+                follow.style.animationDirection = "normal"
+                follow.style.animation = "swipe-left 0.2s 1"
+                await delay(190);
+                await setToggleFollower(b);
+            }
+        } catch {
+            await setToggleFollower(b);
+        }
+        
+    };
+
   if (!user) {
     return <p>Please log in to view your profile.</p>;
   }
 
   return (
       <>
-            <div class="popup" id="popup"><span class="popuptext">Edit Profile Success!</span></div>
+            <div className="popup" id="popup"><span class="popuptext">Edit Profile Success!</span></div>
           <div className={editing ? 'profilepage editing' : 'profilepage'}>
               
         <h2>Your Profile</h2>
@@ -223,35 +253,40 @@ const Profile = () => {
         {toggleFollower ? (
           <div className="followersbox">
             <div style={{display:"flex", flex:"1 1 100%", flexWarp:"warp"}}>
-              <button onClick={() => setToggleFollower(true)} className="toggleFollowButton" style={{borderBottom:"solid 0.5em #4499cc" }}><h3>Followers</h3></button>
-              <button onClick={() => setToggleFollower(false)} className="toggleFollowButton"><h3>Following</h3></button>
+              <button onClick={() => changeToggleFollower(true)} id="followerButton" className="toggleFollowButton" style={{ borderBottom: "solid 0.5em #4499cc"} } ><h3>Followers</h3></button>
+              <button onClick={() => changeToggleFollower(false)} id="followingButton" className="toggleFollowButton"><h3>Following</h3></button>
             </div>
-            
+            <span className="followList">
             {followersList.length === 0 ? (
-              <p>No followers</p>
+                              <p id="follow">No followers</p>
             ) : (
-              <ul>
+                <ul id="follow">
                 {followersList.map(f => (
                   <li key={f}><a href={"/user/" + f}>{f}</a></li>
                 ))}
               </ul>
-          )}
+                          )}
+          </span>
         </div>
         ) : (
           <div className="followingbox">
             <div style={{display:"flex", flex:"1 1 100%", flexWarp:"warp"}}>
-              <button onClick={() => setToggleFollower(true)} className="toggleFollowButton"><h3>Followers</h3></button>
-              <button onClick={() => setToggleFollower(false)} className="toggleFollowButton" style={{borderBottom:"solid 0.5em #4499cc"}}><h3>Following</h3></button>
-              </div>
+                <button onClick={() => changeToggleFollower(true)} id="followerButton" className="toggleFollowButton"><h3>Followers</h3></button>
+                              <button onClick={() => changeToggleFollower(false)} id="followingButton" className="toggleFollowButton" style={{ borderBottom: "solid 0.5em #4499cc" }}><h3>Following</h3></button>
+                          </div>
+
             {followingList.length === 0 ? (
-              <p>Not following anyone</p>
-            ) : (
-              <ul>
-                {followingList.map(f => (
-                  <li key={f}><a href={"/user/" + f}>{f}</a></li>
-                ))}
-              </ul>
-            )}
+                              <p id="follow">Not following anyone</p>
+                          ) : (
+                        
+                                  <ul id="follow">
+                            {followingList.map(f => (
+                                <li key={f}><a href={"/user/" + f}>{f}</a></li>
+                            ))}
+                                </ul>
+                       
+              
+                              )}
           </div>
         )}
         

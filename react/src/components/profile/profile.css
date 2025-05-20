@@ -121,13 +121,12 @@
 
 /* followers & following layout */
 .followsection {
-  display: flex;
-  width: 50%;
-  align-self: center;
-  gap: var(--gap);
-  margin-top: var(--gap);
-  margin-left: 25%;
-  margin-right: 25%;
+    display: flex;
+    max-width: 44rem;
+    margin: 2rem auto;
+    align-self: center;
+    gap: var(--gap);
+    margin-top: var(--gap);
 }
 .followersbox,
 .followingbox {
@@ -163,16 +162,59 @@
     width: 100%;
     background-color: white;
     border: 0;
-    border-bottom: solid 0.5em white;
+    border-bottom: solid 0.5em transparent;
     align-items: center;
 }
-.toggleFollowButton:hover {
-  background-color:#dddddd;
+    .toggleFollowButton:hover {
+        animation: toggleFollowButton 0.2s 1;
+        background-color: #f5f5f5;
+        scale: 105%;
+        border-radius: 10px;
+    }
+
+@keyframes toggleFollowButton {
+    0% {
+        background-color: white;
+        scale: 100%;
+        border-radius: 0px;
+    }
+    100% {
+        background-color: #f5f5f5;
+        scale: 105%;
+        border-radius: 10px;
+    }
 }
 
 .toggleFollowButton:active {
     border-bottom: solid 0.5em #66aaee;
     animation: toggleFollow 0.15s 1;
+}
+
+li {
+    animation: none;
+}
+
+@keyframes swipe-left {
+    0% {
+        transform: translateX(0);
+        opacity: 100%;
+    }
+    100% {
+        transform: translateX(-100px);
+        opacity: 0%
+    }
+}
+
+@keyframes swipe-right {
+    0% {
+        transform: translateX(0);
+        opacity: 100%;
+    }
+
+    100% {
+        transform: translateX(100px);
+        opacity: 0%
+    }
 }
 
 @keyframes toggleFollow {
@@ -182,7 +224,6 @@
     100% {
         border-bottom: solid 0.5em #66aaee;
     }
-    
 }
 
 .popup {
