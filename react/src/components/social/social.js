@@ -90,7 +90,7 @@ const Social = () => {
             const response = await axios.post('http://localhost:5001/get-log', {
                 username: following,
                 range_start: page * ITEMS_PER_PAGE,
-                range_end: (page + 1) * ITEMS_PER_PAGE
+                range_end: (page + 1) * ITEMS_PER_PAGE + 1
             });
             setFollowLogs(response.data.combined || []);
         } catch (err) {
@@ -195,7 +195,7 @@ const Social = () => {
                 )}
 
                 <h1>Following user logs</h1>
-                {followLogs.length === 0 ? (
+                {followLogs.slice(0, ITEMS_PER_PAGE).length === 0 ? (
                     <p>No workouts recorded yet</p>
                 ) : (
                     <>
@@ -222,7 +222,7 @@ const Social = () => {
                                 <span>Page {page + 1}</span>
                                 <button
                                     onClick={() => setPage(p => p + 1)}
-                                    disabled={followLogs.length < ITEMS_PER_PAGE}
+                                    disabled={followLogs.length < ITEMS_PER_PAGE + 1 }
                                 >
                                     Next
                                 </button>

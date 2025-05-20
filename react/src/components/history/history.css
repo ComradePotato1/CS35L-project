@@ -1,0 +1,12 @@
+.log {
+    animation: none
+}
+
+@keyframes logItemFadeIn {
+    0% {
+        backdrop-filter: brightness(90%);
+    }
+    100% {
+        backdrop-filter: brightness(100%);
+    }
+}

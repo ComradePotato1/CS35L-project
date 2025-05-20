@@ -7,6 +7,7 @@ import "./navbar.css";
 const Navbar = () => {
     const { user } = useContext(AuthContext);
     const location = useLocation();
+    const navigate = useNavigate();
     const excludedRoutes = ['/'];
     const hideNavbar = excludedRoutes.includes(location.pathname);
     const [followbackCount, setFollowbackCount] = useState(0);
@@ -35,34 +36,40 @@ const Navbar = () => {
                 <img src="" alt="logo" className="logo-image"/>
             </a>
             <div className="links">
-                {user ? (
-                    <a href="/home" className="home">Home</a>
+                    {user ? (
+                        <button onClick={() => navigate("/home")} className={location.pathname === "/home" ? "active-link-container" : "link-container"}>
+                            <a href="/home" className="home">Home</a>
+                        </button>
                 ) : (<span />)
                 }
 
                 {user ? (
-                    <a href="/history" className="home">History</a>
+                        <button onClick={() => navigate("/history")} className={location.pathname === "/history" ? "active-link-container" : "link-container"}>
+                            <a href="/history" className="home">History</a>
+                    </button>
                 ) : (<span />)
                 }
 
                     {user ? (
                         <div>
-                            {followbackCount ? (
-                                <a href="/social" className="hover">Social {followbackCount}</a>
-                            ) : (
-                                <a href="/social" className="home">Social</a>
-                            )}
-                            
+                            <button onClick={() => navigate("/social")} className={location.pathname === "/social" ? "active-link-container" : "link-container"}>
+                                {followbackCount ? (
+                                    <a href="/social" className={location.pathname === "/social" ? "home" : "hover"}>Social {followbackCount}</a>
+                                ) : (
+                                    <a href="/social" className="home">Social</a>
+                                )}
+                            </button>
                         </div>
                 ) : (<span />)
                 }
-
+                    <button onClick={() => navigate("/profile")} className={location.pathname === "/profile" ? "active-link-container" : "link-container"}>
                 {user ? (
-                    <a href="/profile" className="login">Profile</a>
+                    <a href="/profile" className="home">Profile</a>
                 ) : (
-                    <a href="/login" className="login">Login</a>
+                    <a href="/login" className="home">Login</a>
                 )
-                }
+                        }
+                </button>
             </div>
             </nav>
         )

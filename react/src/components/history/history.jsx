@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import delay from 'delay';
 import LogItem from '../LogItem/LogItem.jsx';
+import "./history.css"
 import { AuthContext } from "../auth/auth";
 import '../../App.css';
 import {Radar, RadarChart,PolarGrid,PolarAngleAxis,PolarRadiusAxis } from 'recharts';
@@ -20,7 +22,7 @@ const History = () => {
       const response = await axios.post('http://localhost:5001/get-log', {
         username: [user],
         range_start: page * ITEMS_PER_PAGE,
-        range_end: (page + 1) * ITEMS_PER_PAGE
+        range_end: (page + 1) * ITEMS_PER_PAGE + 1
       });
       setLogs(response.data.combined || []);
     } catch (err) {
@@ -54,9 +56,14 @@ const History = () => {
                 : log
             )
           : [...prevLogs, { ...logData, log_id: response.data.log_id }]
-      );
-      
-      setEditingLogId(null);
+        );
+        setEditingLogId(null);
+        const savelog = document.getElementById(logData.log_id);
+        savelog.style.animation = "logItemFadeIn 3s 1";
+        await delay(2900);
+        savelog.style.animation = "none";
+
+        
     } catch (err) {
       console.error("Save failed:", err);
       alert(err.response?.data?.error || "Failed to save");
@@ -141,7 +148,7 @@ const getStats = async () => {
   if (loading) return <div className="loading">Loading...</div>;
 
   return (
-    <div className="history-container">
+      <div className="history-container">
       <h2>Your Workout History</h2>
       <RadarChart
         cx={300}
@@ -164,25 +171,30 @@ const getStats = async () => {
                   fillOpacity={0.6}
                   strokeWidth="3.5"
         />
-    </RadarChart>
+          </RadarChart>
+
       {logs.length === 0 ? (
         <p>No workouts recorded yet</p>
       ) : (
         <>
           <div className="log-list">
-            {logs.map((log) => (
-              <LogItem
-                key={log.log_id}
-                log={log}
-                isEditing={editingLogId === log.log_id}
-                onEdit={() => setEditingLogId(log.log_id)}
-                onSave={handleSaveLog}
-                onCancel={() => setEditingLogId(null)}
-                    onReact={handleReact}
-                    onUnreact={handleUnreact}
-                currentUser={user}
-              />
-            ))}
+              
+                  {logs.slice(0, ITEMS_PER_PAGE).map((log) => (
+                      <div className="log" id={log.log_id }>
+                  <LogItem
+                    key={log.log_id}
+                    log={log}
+                    isEditing={editingLogId === log.log_id}
+                    onEdit={() => setEditingLogId(log.log_id)}
+                    onSave={handleSaveLog}
+                    onCancel={() => setEditingLogId(null)}
+                        onReact={handleReact}
+                        onUnreact={handleUnreact}
+                    currentUser={user}
+                          />
+                      </div>
+                ))}
+               
           </div>
 
           {/* Pagination */}
@@ -196,7 +208,7 @@ const getStats = async () => {
             <span>Page {page + 1}</span>
             <button 
               onClick={() => setPage(p => p + 1)} 
-              disabled={logs.length < ITEMS_PER_PAGE}
+              disabled={logs.length < ITEMS_PER_PAGE + 1}
             >
               Next
             </button>

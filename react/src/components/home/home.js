@@ -108,16 +108,17 @@ const Home = () => {
       });
         const popup = document.getElementById('popup');
         popup.style.display = "flex";
-        await delay(1900);
-        popup.style.display = "none";
-
+        await delay(400);
       setActivity('');
       setDay(today); //default to todays date, should prob make end date to length of workout.
       setStart(currentTime);
       setDuration('');
       setPost('');
       setError('');
-      setIcon('/images/icons/workout.svg');
+        setIcon('/images/icons/workout.svg');
+        
+        await delay(3500);
+        popup.style.display = "none";
     } catch (error) {
       console.error('Failed to add Workout:', error.response?.data || error);
       alert('There was an error adding your workout.');

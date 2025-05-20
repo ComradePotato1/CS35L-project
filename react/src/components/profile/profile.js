@@ -96,7 +96,7 @@ const Profile = () => {
         setEditing(false);
         const popup = document.getElementById('popup');
         popup.style.display = "flex";
-        await delay(5000);
+        await delay(4900);
         popup.style.display = "none";
     } catch (err) {
       console.error('Could not update profile', err.response);
@@ -223,7 +223,7 @@ const Profile = () => {
         {toggleFollower ? (
           <div className="followersbox">
             <div style={{display:"flex", flex:"1 1 100%", flexWarp:"warp"}}>
-              <button onClick={() => setToggleFollower(true)} className="toggleFollowButton" style={{borderBottom:"solid 0.5em #4499cc", }}><h3>Followers</h3></button>
+              <button onClick={() => setToggleFollower(true)} className="toggleFollowButton" style={{borderBottom:"solid 0.5em #4499cc" }}><h3>Followers</h3></button>
               <button onClick={() => setToggleFollower(false)} className="toggleFollowButton"><h3>Following</h3></button>
             </div>
             

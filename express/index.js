@@ -356,6 +356,27 @@ app.post('/get-react', async (req, res) => {
     }
 });
 
+app.post('/search-user', async (req, res) => {
+    try {
+        const { username } = req.body;
+
+        const [rows] = await pool.execute(
+            'SELECT * FROM users WHERE username like ?',
+            [username+'%']
+        );
+
+        let result = [];
+        //change 3 later
+        for (let i = 0; i < 3 && i < rows.length; i++) {
+            result.push({ username: rows[i].username, name:rows[i].name, profile: rows[i].profile });
+        }
+
+        res.status(200).json({ result });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 app.post('/follow', async (req, res) => {
     try {
         const { follower, followee, unfollow } = req.body;

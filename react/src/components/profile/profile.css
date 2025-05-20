@@ -159,22 +159,37 @@
 }
 
 .toggleFollowButton {
-  height: 3em;
-  width:100%;
-  background-color: white;
-  border: 0;
-  
-  align-items:center;
+    height: 3em;
+    width: 100%;
+    background-color: white;
+    border: 0;
+    border-bottom: solid 0.5em white;
+    align-items: center;
 }
 .toggleFollowButton:hover {
   background-color:#dddddd;
+}
+
+.toggleFollowButton:active {
+    border-bottom: solid 0.5em #66aaee;
+    animation: toggleFollow 0.15s 1;
+}
+
+@keyframes toggleFollow {
+    0% {
+        border-bottom: solid 0.5em white;
+    }
+    100% {
+        border-bottom: solid 0.5em #66aaee;
+    }
+    
 }
 
 .popup {
     position: absolute;
     margin-right: 10%;
     display: none;
-    margin-left: 40%;   
+    margin-left: 40%;
     cursor: default;
     animation: fadeIn 5s 1;
     width: 100%;
