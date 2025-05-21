@@ -53,7 +53,7 @@ nav .title {
     align-content: center;
     text-align: center;
     border: 0;
-    border-top: solid white 4.5px;
+    border-top: solid #dddddd 4.5px;
     background-color: white;
     cursor: pointer;
 }

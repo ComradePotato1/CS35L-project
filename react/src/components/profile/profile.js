@@ -18,7 +18,6 @@ const Profile = () => {
     weeklyGoal: false
   });
   const [editing, setEditing] = useState(false);
-  const [error, setError] = useState("");
   const [toggleFollower, setToggleFollower] = useState(true) 
   //const [isOpen, setIsOpen] = useState(false);
   const profileOptions = ['pic-0', 'pic-1', 'pic-2', 'pic-3'];
@@ -36,7 +35,6 @@ const Profile = () => {
         setInfo(res.data.rows[0]);
       } catch (err) {
         console.error('Cannot load profile:', err.response?.data || err);
-        setError('Cannot load Profile');
       }
       
     }
@@ -66,13 +64,11 @@ const Profile = () => {
   const handleEditing = (param) => (tobj) => {
     const value = tobj.target.value;
     setInfo({ ...info, [param]: value });
-    setError('');
   };
 
   const handleEditingBox = (param) => (tobj) => {
     const checked = tobj.target.checked;
     setInfo({ ...info, [param]: checked });
-    setError('');
   };
 
 
@@ -100,7 +96,7 @@ const Profile = () => {
         popup.style.display = "none";
     } catch (err) {
       console.error('Could not update profile', err.response);
-      setError('Could not update Profile');
+
     }
   };
 

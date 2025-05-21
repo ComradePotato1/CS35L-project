@@ -27,28 +27,28 @@ const Navbar = () => {
 
         handleCount();
 
-    } );
+    });
 
     return (
         !hideNavbar && (
-        <nav className="nav">
-            <a href="/home" className="sitename">
-                <img src="" alt="logo" className="logo-image"/>
-            </a>
-            <div className="links">
+            <nav className="nav">
+                <a href="/home" className="sitename">
+                    <img src="" alt="logo" className="logo-image" />
+                </a>
+                <div className="links">
                     {user ? (
                         <button onClick={() => navigate("/home")} className={location.pathname === "/home" ? "active-link-container" : "link-container"}>
                             <a href="/home" className="home">Home</a>
                         </button>
-                ) : (<span />)
-                }
+                    ) : (<span />)
+                    }
 
-                {user ? (
+                    {user ? (
                         <button onClick={() => navigate("/history")} className={location.pathname === "/history" ? "active-link-container" : "link-container"}>
                             <a href="/history" className="home">History</a>
-                    </button>
-                ) : (<span />)
-                }
+                        </button>
+                    ) : (<span />)
+                    }
 
                     {user ? (
                         <div>
@@ -60,17 +60,25 @@ const Navbar = () => {
                                 )}
                             </button>
                         </div>
-                ) : (<span />)
-                }
+                    ) : (<span />)
+                    }
+
+                    {user ? (
+                        <button onClick={() => navigate("/user")} className={location.pathname.slice(0,5) === "/user" ? "active-link-container" : "link-container"}>
+                            <a href="/user" className="home">Discover</a>
+                        </button>
+                    ) : (<span />)
+                    }
+
                     <button onClick={() => navigate("/profile")} className={location.pathname === "/profile" ? "active-link-container" : "link-container"}>
-                {user ? (
-                    <a href="/profile" className="home">Profile</a>
-                ) : (
-                    <a href="/login" className="home">Login</a>
-                )
+                        {user ? (
+                            <a href="/profile" className="home">Profile</a>
+                        ) : (
+                            <a href="/login" className="home">Login</a>
+                        )
                         }
-                </button>
-            </div>
+                    </button>
+                </div>
             </nav>
         )
     );

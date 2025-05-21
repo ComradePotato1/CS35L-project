@@ -42,7 +42,7 @@ const Home = () => {
 
   function changeIcon(text) {
     const lower = text.toLowerCase();
-    if (lower.includes("run") || lower.includes('ran')) {
+    if (lower.includes("run") || lower.includes('ran') || lower.includes('sprint')) {
         setIcon('/images/icons/running.svg');
         } else if (lower.includes("lift") || lower.includes("weight")) {
         setIcon('/images/icons/dumbbell.svg');
