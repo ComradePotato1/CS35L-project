@@ -56,6 +56,7 @@ nav .title {
     border-top: solid #dddddd 4.5px;
     background-color: white;
     cursor: pointer;
+    transition: scale 0.3s ease;
 }
 
 
@@ -67,10 +68,16 @@ nav .title {
     text-align: center;
     border: 0;
     border-top: solid black 4.5px;
-    animation: active-indicator 0.5s 1;
     background-color: white;
     cursor: pointer;
+    transition: scale 0.3s ease;
+    animation: active-indicator 0.5s 1;
 }
+
+    .link-container:hover, .active-link-container:hover {
+        filter: brightness(97%);
+        scale: 110%;
+    }
 
 .home {
     color: black;
@@ -96,11 +103,7 @@ nav .title {
     display: flex;
 }
 
-.link-container:hover, .active-link-container:hover {
-    filter: brightness(97%);
-    scale: 110%;
-    animation: selected-indicator 0.2s 1;
-}
+
 
 @keyframes hoverAnimation {
     0%, 100% {
@@ -117,15 +120,5 @@ nav .title {
     }
     100% {
         border-top: solid black 4.5px;
-    }
-}
-
-@keyframes selected-indicator {
-    0% {
-        scale: 100%;
-    }
-
-    100% {
-        scale: 110%;
     }
 }
