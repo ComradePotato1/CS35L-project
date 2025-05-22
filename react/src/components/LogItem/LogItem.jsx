@@ -107,17 +107,13 @@ const LogItem = ({
                     <div className="form-group">
                         <label>Activity:</label>
                         <input
+                            type="text"
                             name="activity"
                             value={formData.activity}
                             onChange={handleChange}
+                            placeholder="Exercise"
                             required
-                        >
-                            {/*<option value="">Select activity</option>
-                            <option value="Running">Running</option>
-                            <option value="Cycling">Cycling</option>
-                            <option value="Swimming">Swimming</option>
-                            <option value="Weight Training">Weight Training</option>*/}
-                        </input>
+                        />
                     </div>
 
                     <div className="form-group">
