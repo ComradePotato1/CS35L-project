@@ -209,7 +209,7 @@ const Home = () => {
           <div className="pastwork">
             {pastWorkouts.map(log => (
               <div key={log.log_id} className="pastitem">
-                <strong>{log.activity}</strong> on {log.day} at {log.start} for {log.duration} min
+                <strong>{log.activity}</strong> on {log.day.slice(0, 10)} at {log.start} for {log.duration} min
               </div>
             ))}
           </div>
