@@ -71,7 +71,14 @@
     height: auto;
     min-height: var(--stanheight);
   }
-  
+
+  .form input:hover {
+    background-color: #eef6fb; /* soft blue background */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* subtle shadow */
+    border: 1px solid #4499cc; /* light blue border */
+    transition: background-color 0.1s ease, box-shadow 0.1s ease, border 0.1s ease;
+  }
+
   .form button {
     height: var(--stanheight);
     padding: 0 1rem;
@@ -83,6 +90,13 @@
     border: none;
     box-shadow: var(--buttonshadow);
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .form button:hover {
+    background-color: #3377aa; /* slightly darker blue */
+    transform: translateY(-1px);
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.1);
   }
 
   .errors {
