@@ -13,7 +13,7 @@ const Logout = () => {
         // Function to be executed on component load
         function handleLogout() {
             logout();
-            navigate("/login");
+            navigate("/");
         }
 
         handleLogout();

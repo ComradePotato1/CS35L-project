@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import '../../App.css';
+import './social.css';
 import { AuthContext } from "../auth/auth.js"
 import axios from 'axios';
 import LogItem from '../LogItem/LogItem.jsx';
@@ -148,7 +149,7 @@ const Social = () => {
 
 
     return (
-        <div>
+        <div className="social-container">
             <div>
 
                 

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import '../../App.css';
+import './user.css';
 import { AuthContext } from "../auth/auth.js"
 import LogItem from '../LogItem/LogItem.jsx';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from 'recharts';
@@ -177,7 +178,7 @@ const User = () => {
         }
     }
     return (
-        <div>
+        <div className="user-container">
             {userExists ? (
                 <>
                 <p>user page for {queryUser}</p>
@@ -199,8 +200,9 @@ const User = () => {
                             <PolarGrid stroke="#111" />
                             <PolarAngleAxis dataKey="activity" />
                             <PolarRadiusAxis type="number" domain={[-10, 100]} />
-                            <Radar name={queryUser} dataKey="A" stroke="#4499cc" fill="#4499cc" fillOpacity={0.6} strokeWidth="3.5" />
-                            <Radar name={user} dataKey="B" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} strokeWidth="3.5"/>
+                            
+                            <Radar name={queryUser} dataKey="A" stroke="#4499cc" fill="#4499cc" fillOpacity={0.7} strokeWidth="3.5" />
+                            <Radar name="Me" dataKey="B" stroke="#aaa" fill="#aaa" fillOpacity={0.4} strokeWidth="3.5"/>
                             <Legend></Legend>
                         </RadarChart>
                     <div className="log-list">

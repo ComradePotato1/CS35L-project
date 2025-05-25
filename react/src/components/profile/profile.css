@@ -85,10 +85,18 @@
   border-radius: var(--stanbradius);
   cursor: pointer;
   box-shadow: var(--buttonshadow);
+  transition: all 0.2s ease;
 }
 
 .editbutton {
   right: var(--gap);
+  
+}
+
+.editbutton:hover,
+.savebutton:hover {
+  opacity: 95%;
+  scale: 110%;
 }
 
 .profilepage.editing .editbutton {
@@ -227,6 +235,7 @@ li {
 }
 
 .popup {
+  z-index:11;
     position: absolute;
     margin-right: 10%;
     display: none;

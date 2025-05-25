@@ -155,6 +155,7 @@
   }
 
 .popup-home {
+  z-index:11;
     position: absolute;
     margin-right: 10%;
     display: none;
