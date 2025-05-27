@@ -4,6 +4,9 @@ import './home.css'
 import '../../App.css';
 import { AuthContext } from "../auth/auth.js";
 import delay from 'delay';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+
 
 const Home = () => {
   const { user } = useContext(AuthContext);
@@ -21,6 +24,32 @@ const Home = () => {
   const [error, setError] = useState('');
   const [icon, setIcon] = useState('/images/icons/workout.svg');
   const [pastWorkouts, setPastWorkouts] = useState([]);
+
+    const [inputValue, setInputValue] = useState('');
+    const [promptResponses, setpromptResponses] = useState([]);
+
+
+    const genAI = new GoogleGenerativeAI(
+        "AIzaSyCjKRjNSU9UwkgtpIb0reNGjbmotkh7Xs8"
+    );
+
+
+    const getResponseForGivenPrompt = async () => {
+        try {            
+            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+            const result = await model.generateContent("can you give me one workout recommendation based on the three past workouts attached below in JSON object format, try diversifying my activities and duration, give me different recommendations \n" + JSON.stringify(pastWorkouts) + " \nReturn only the activity recommendation and the duration");
+            setInputValue('')
+            const response = result.response;
+            const text = response.text();
+            console.log(text)
+            setpromptResponses([...promptResponses, text]);
+        }
+        catch (error) {
+            alert("error")
+            console.log(error)
+            console.log("Something Went Wrong");
+        }
+    }
 
 
   useEffect(() => {
@@ -214,7 +243,16 @@ const Home = () => {
             ))}
           </div>
           )}
-      </section>
+          </section>
+
+          {/*test*/}
+                <button onClick={getResponseForGivenPrompt}>Get Workout recs</button>
+                {promptResponses.map((promptResponse, index) => (
+                  <div key={index} >
+                      <div className={`response-text ${index === promptResponses.length - 1 ? 'fw-bold' : ''}`}>{promptResponse}</div>
+                  </div>
+              ))
+          }
     </div>
   );
 };
