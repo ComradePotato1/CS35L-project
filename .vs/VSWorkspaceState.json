@@ -4,13 +4,12 @@
     "\\react",
     "\\react\\src",
     "\\react\\src\\components",
-    "\\react\\src\\components\\history",
+    "\\react\\src\\components\\home",
     "\\react\\src\\components\\LogItem",
     "\\react\\src\\components\\navbar",
     "\\react\\src\\components\\profile",
     "\\react\\src\\components\\social",
     "\\react\\src\\components\\user"
   ],
-  "SelectedNode": "\\react\\src\\components\\profile\\profile.js",
   "PreviewInSolutionExplorer": false
 }

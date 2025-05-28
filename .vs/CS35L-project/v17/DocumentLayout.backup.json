@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "D:\\Documents\\GitHub\\CS35L-project\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Documents\\GitHub\\CS35L-project\\react\\src\\components\\home\\home.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:react\\src\\components\\home\\home.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Documents\\GitHub\\CS35L-project\\react\\src\\components\\social\\social.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:react\\src\\components\\social\\social.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Documents\\GitHub\\CS35L-project\\react\\src\\components\\history\\history.jsx||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:react\\src\\components\\history\\history.jsx||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Documents\\GitHub\\CS35L-project\\react\\src\\components\\navbar\\navbar.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:react\\src\\components\\navbar\\navbar.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Documents\\GitHub\\CS35L-project\\react\\src\\components\\navbar\\navbar.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
@@ -39,19 +39,32 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "home.js",
+              "DocumentMoniker": "D:\\Documents\\GitHub\\CS35L-project\\react\\src\\components\\home\\home.js",
+              "RelativeDocumentMoniker": "react\\src\\components\\home\\home.js",
+              "ToolTip": "D:\\Documents\\GitHub\\CS35L-project\\react\\src\\components\\home\\home.js",
+              "RelativeToolTip": "react\\src\\components\\home\\home.js",
+              "ViewState": "AgIAAPUAAAAAAAAAAAAAwPwAAAAYAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-05-27T04:37:15.055Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "social.js",
               "DocumentMoniker": "D:\\Documents\\GitHub\\CS35L-project\\react\\src\\components\\social\\social.js",
               "RelativeDocumentMoniker": "react\\src\\components\\social\\social.js",
               "ToolTip": "D:\\Documents\\GitHub\\CS35L-project\\react\\src\\components\\social\\social.js",
               "RelativeToolTip": "react\\src\\components\\social\\social.js",
-              "ViewState": "AgIAAEgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAAE8AAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
               "WhenOpened": "2025-05-22T23:57:20.303Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "history.jsx",
               "DocumentMoniker": "D:\\Documents\\GitHub\\CS35L-project\\react\\src\\components\\history\\history.jsx",
               "RelativeDocumentMoniker": "react\\src\\components\\history\\history.jsx",
@@ -60,18 +73,6 @@
               "ViewState": "AgIAADAAAAAAAAAAAAAAAAoAAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
               "WhenOpened": "2025-05-22T23:53:15.196Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "navbar.css",
-              "DocumentMoniker": "D:\\Documents\\GitHub\\CS35L-project\\react\\src\\components\\navbar\\navbar.css",
-              "RelativeDocumentMoniker": "react\\src\\components\\navbar\\navbar.css",
-              "ToolTip": "D:\\Documents\\GitHub\\CS35L-project\\react\\src\\components\\navbar\\navbar.css",
-              "RelativeToolTip": "react\\src\\components\\navbar\\navbar.css",
-              "ViewState": "AgIAADcAAAAAAAAAAAAAAEkAAAAnAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2025-05-22T03:00:32.409Z"
             },
             {
               "$type": "Document",
@@ -96,10 +97,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
               "WhenOpened": "2025-05-21T02:58:50.298Z"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
             }
           ]
         }

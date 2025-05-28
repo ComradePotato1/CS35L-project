@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2/promise');
-//const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
@@ -42,7 +42,6 @@ pool.query("CREATE TABLE IF NOT EXISTS stats ( username VARCHAR (255), aerobic S
 pool.query(`CREATE TABLE IF NOT EXISTS log (log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME, duration INT, post VARCHAR(255), calories INT)`); 
 pool.query("CREATE TABLE IF NOT EXISTS react ( log_id INT, username VARCHAR(255) )");
 pool.query("CREATE TABLE IF NOT EXISTS follow ( follower VARCHAR(255) , followee VARCHAR(255) )");
-//pool.query("CREATE TABLE IF NOT EXISTS requests ( follower VARCHAR(255) , followee VARCHAR(255) )");
 
 app.get('/test', async (req, res) => {
     res.status(200).json({ message: 'test success' });
@@ -75,7 +74,7 @@ app.post('/register', async (req, res) => {
             [username]
         );
 
-        await pool.execute('INSERT INTO stats (username) VALUES (?)',
+        await pool.execute('INSERT INTO stats (username, aerobic, stretching, strengthening, balance, rest, other) VALUES (?, 0, 0, 0, 0, 0, 0)',
             [username]
         );
 
