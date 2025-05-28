@@ -127,6 +127,7 @@ const Social = () => {
                 log_id: logId,
                 username: user
             });
+            fetchFollowerLogs();
             fetchRecLogs();
             fetchFollowLogs();
         } catch (err) {
@@ -140,6 +141,7 @@ const Social = () => {
                 log_id: logId,
                 username: user
             });
+            fetchFollowerLogs();
             fetchRecLogs();
             fetchFollowLogs();
         } catch (err) {

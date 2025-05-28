@@ -37,9 +37,9 @@ const workoutCategories = {
 };
 
 pool.query(`USE ${process.env.DB_NAME}`);
-pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), profile VARCHAR(255) DEFAULT 'pic-0', weight SMALLINT(15), height SMALLINT(15), dailyGoal BOOLEAN, weeklyGoal BOOLEAN )");
+pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), profile VARCHAR(255) DEFAULT 'pic-0', weight SMALLINT(15), height SMALLINT(15), age SMALLINT(15), social BOOLEAN DEFAULT TRUE )");
 pool.query("CREATE TABLE IF NOT EXISTS stats ( username VARCHAR (255), aerobic SMALLINT(15) DEFAULT 0, stretching SMALLINT(15) DEFAULT 0 , strengthening SMALLINT(15) DEFAULT 0, balance SMALLINT(15) DEFAULT 0, rest SMALLINT(15) DEFAULT 0 , other SMALLINT(15) DEFAULT 0 )");
-pool.query(`CREATE TABLE IF NOT EXISTS log (log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME, duration INT, post VARCHAR(255))`); 
+pool.query(`CREATE TABLE IF NOT EXISTS log (log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME, duration INT, post VARCHAR(255), calories INT)`); 
 pool.query("CREATE TABLE IF NOT EXISTS react ( log_id INT, username VARCHAR(255) )");
 pool.query("CREATE TABLE IF NOT EXISTS follow ( follower VARCHAR(255) , followee VARCHAR(255) )");
 //pool.query("CREATE TABLE IF NOT EXISTS requests ( follower VARCHAR(255) , followee VARCHAR(255) )");
@@ -52,8 +52,7 @@ app.post('/register', async (req, res) => {
     try {
         const { username, password } = req.body;
         const profile = "pic-0"
-        //const hashedPassword = await bcrypt.hash(password, 10);
-        //suspend hashing passwords for simplicity?
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const [rows] = await pool.execute(
             'SELECT * FROM users WHERE username = ?',
@@ -66,8 +65,14 @@ app.post('/register', async (req, res) => {
 
         const [result] = await pool.execute(
             'INSERT INTO users (username, password, profile) VALUES (?, ?, ?)',
-            [username, password, profile]
+            [username, hashedPassword, profile]
             //[username, hashedPassword]
+        );
+
+        await pool.execute(
+            `INSERT INTO log (username, activity, day, start, duration, post, calories)
+           VALUES (?, "demo", '2025-01-01 00:00:00', '00:00:00', 0, "", 0)`,
+            [username]
         );
 
         await pool.execute('INSERT INTO stats (username) VALUES (?)',
@@ -87,14 +92,14 @@ app.post('/login', async (req, res) => {
             'SELECT * FROM users WHERE username = ?',
             [username]
         );
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         if (rows.length === 0) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        const match = (password == rows[0].password);
-        //const match = await bcrypt.compare(password, rows[0].password);
-        //suspend hashing
+        //const match = (password == rows[0].password);
+        const match = await bcrypt.compare(password, rows[0].password);
         if (!match) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
@@ -132,10 +137,10 @@ app.post('/change-password', async (req, res) => {
 
 app.post('/update-profile', async (req, res) => {
     try {
-        const { username, name, profile, weight, height, dailyGoal, weeklyGoal } = req.body;
+        const { username, name, profile, weight, height, age, social } = req.body;
         await pool.execute(
-            'UPDATE users SET name = ?, profile = ?, weight = ?, height = ?, dailyGoal = ?, weeklyGoal = ? WHERE username = ?',
-            [name, profile, weight, height, dailyGoal, weeklyGoal, username]
+            'UPDATE users SET name = ?, profile = ?, weight = ?, height = ?, age = ?, social = ? WHERE username = ?',
+            [name, profile, weight, height, age, social, username]
         );
 
         res.json({ message: 'Update successful' });
@@ -165,7 +170,7 @@ app.post('/get-userinfo', async (req, res) => {
 
 app.post('/log', async (req, res) => {
     try {
-      const { log_id, username, activity, day, start, duration, post } = req.body;
+      const { log_id, username, activity, day, start, duration, post, calories } = req.body;
 
       if (duration <= 0) {
         return res.status(400).json({ error: "Duration must be positive"});
@@ -179,17 +184,17 @@ app.post('/log', async (req, res) => {
         // Update existing log
         await pool.execute(
           `UPDATE log 
-           SET activity=?, day=?, start=?, duration=?, post=?
+           SET activity=?, day=?, start=?, duration=?, post=?, calories=?
            WHERE log_id=? AND username=?`,
-          [activity, day, start, duration, post, log_id, username]
+          [activity, day, start, duration, post, calories, log_id, username]
         );
         return res.status(200).json({ message: 'Log updated successfully' });
       } else {
         // Create new log
         const [result] = await pool.execute(
-          `INSERT INTO log (username, activity, day, start, duration, post)
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          [username, activity, day, start, duration, post]
+          `INSERT INTO log (username, activity, day, start, duration, post, calories)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [username, activity, day, start, duration, post, calories]
         );
         return res.status(200).json({ 
           message: 'Log created successfully',
@@ -251,7 +256,7 @@ app.post('/refresh-stats', async (req, res) => {
                 if (keywords.some(keyword => lower.includes(keyword))) {
                     await pool.execute(
                         `UPDATE stats SET ${cat} = ${cat} + ? WHERE username = ?`,
-                        [result[i].duration, result[i].username]
+                        [result[i].calories, result[i].username]
                     );
                 }
             }
@@ -264,13 +269,13 @@ app.post('/refresh-stats', async (req, res) => {
 
 app.post('/add-stats', async(req, res) => {
     try {
-        const { username, activity, duration} = req.body;
+        const { username, activity, calories} = req.body;
         const lower = activity.toLowerCase();
         for (const [cat, keywords] of Object.entries(workoutCategories)) {
             if (keywords.some(keyword => lower.includes(keyword))) {
                 await pool.execute(
                     `UPDATE stats SET ${cat} = ${cat} + ? WHERE username = ?`,
-                    [duration, username]
+                    [calories, username]
                 );
             }
         }
@@ -531,9 +536,9 @@ app.post('/update-log', async (req, res) => {
 
         await pool.executes(
             `UPDATE log
-            SET activity = ?, post = ?, day = ?, start = ?, duration = ?
+            SET activity = ?, post = ?, day = ?, start = ?, duration = ?, calories = ?
             WHERE log_id = ?`,
-            [activity, post, day, start, duration, log_id]
+            [activity, post, day, start, duration, calories, log_id]
         );
         res.status(200).json({ message: 'Log updated successfully' });
     } catch (error) {

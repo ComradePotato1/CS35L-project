@@ -14,8 +14,8 @@ const Profile = () => {
     profile: '',
     weight: '',
     height: '',
-    age: '',
-    totalCalories: '',
+      age: '',
+      social: true,
   });
   const [editing, setEditing] = useState(false);
   const [toggleFollower, setToggleFollower] = useState(true) 
@@ -86,8 +86,8 @@ const Profile = () => {
         profile:    info.profile,
         weight:     info.weight,
         height:     info.height,
-        dailyGoal:  info.dailyGoal,
-        weeklyGoal: info.weeklyGoal
+          age: info.age,
+        social: info.social,
       });
         setEditing(false);
         const popup = document.getElementById('popup');
@@ -251,18 +251,6 @@ const Profile = () => {
          )}
        </div>
 
-       <div className="profile">
-         <label className="tag">Total Calories Burned:</label>
-         {editing ? (
-           <input
-             type="number"
-             value={info.totalCalories}
-             onChange={handleEditing('totalCalories')}
-           />
-         ) : (
-           <span className="val">{info.totalCalories ? info.totalCalories + ' kcal' : '—'}</span>
-         )}
-       </div>
         <Link to="/logout" className="logout">
           Logout
         </Link>

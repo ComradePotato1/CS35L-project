@@ -6,35 +6,11 @@ import { AuthContext } from "../auth/auth.js";
 import delay from 'delay';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const met_table = {
-  walk: 3.5,
-  yoga: 2.5,
-  run: 9.8,
-  cycle: 7.5,
-  swim: 8.0,
-  hike: 6.0,
-  row: 7.0,
-  strength: 6.0,
-  dance: 5.5
-};
 
-// choose a MET by checking if the activity string contains one of the keys
-function getMet(activity) {
-  const act = activity.toLowerCase();
-  for (const [key, met] of Object.entries(met_table)) {
-    if (act.includes(key)) return met;
-  }
-  return 3.5;
-}
 
-function calcCalories(timespent, activity) {
-    const default_weight_pounds = 155;
-  const kg = default_weight_pounds/ 2.205;
-  const mymet = getMet(activity);
-  // calories per minute = (MET × 3.5 × weightKg) / 200
-  const calperMin = (mymet * 3.5 * kg) / 200;
-  return Math.round(calperMin * timespent);
-}
+import AOS from 'aos'
+import 'aos/dist/aos.css';
+
 
 const Home = () => {
   const { user } = useContext(AuthContext);
@@ -52,26 +28,40 @@ const Home = () => {
   const [error, setError] = useState('');
   const [icon, setIcon] = useState('/images/icons/workout.svg');
   const [pastWorkouts, setPastWorkouts] = useState([]);
-  const [weight, setWeight] = useState(155); //accoridng to google
-  const [height, setHeight] = useState(68);  // according to google
-    const [inputValue, setInputValue] = useState('');
     const [promptResponses, setpromptResponses] = useState([]);
+    const [weight, setWeight] = useState(155) //accoridng to google
+    const [height, setHeight] = useState(68);  // according to google
+    const [age, setAge] = useState(20);
+    const [loadingRec, setLoadingRec] = useState(false);
 
+    useEffect(() => {
+        AOS.init({ duration: 2000 });
+    }, []);
 
     const genAI = new GoogleGenerativeAI(
         "AIzaSyCjKRjNSU9UwkgtpIb0reNGjbmotkh7Xs8"
     );
 
 
-
+    const calcCalories = async (timespent, activity, post) => {
+        try {
+            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+            const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} activity: ${activity} time spent: ${timespent} minutes notes(if any): ${post}\n` + "an integer estimate of how much kcal the user burned based on the information given above, return only a number and nothing else";
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            return parseInt(response.text());
+        } catch (error) {
+            alert("generate calorie error");
+        }
+    }
 
     const getResponseForGivenPrompt = async () => {
-        try {            
+        try {
+            setLoadingRec(true);
             const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-            const prompt = `User weight: ${weight} lbs; height: ${height} in.\n` + `Please give me five different workout recommendations based on my recent workouts (JSON below). ` +
+            const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age}\n` + `Please give me three different workout recommendations based on my recent workouts (JSON below). ` +
               `Return ONLY a JSON array of objects with keys "activity" (string) and "duration" (number).\n` + JSON.stringify(pastWorkouts);
             const result = await model.generateContent(prompt);
-            setInputValue('')
             const response = await result.response;
             const text = response.text();
             console.log(text)
@@ -98,9 +88,10 @@ const Home = () => {
               recs = [{ activity: newtext, duration: 0 }];
             }
             setpromptResponses(recs);
+            setLoadingRec(false);
         }
         catch (error) {
-            alert("error")
+            
             console.log(error)
             console.log("Something Went Wrong");
         }
@@ -108,12 +99,15 @@ const Home = () => {
 
     const diversifyRecommendations = async () => {
       if (promptResponses.length === 0) return;
-      try {
+        try {
+            setLoadingRec(true);
+            setpromptResponses([]);
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-        const prompt = `User weight: ${weight} lbs; height: ${height} in.\n` +
+        const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} \n` +
           `Please diversify these workout recommendations by changing their categories (e.g. swap a run for a swim, yoga for a hike, etc). ` +
-          `Return ONLY a JSON array of objects with keys "activity" and "duration".\n` + JSON.stringify(promptResponses);        const result = await model.generateContent(prompt);
-        const text = await result.response.text();
+              `Return ONLY a JSON array of objects with keys "activity" and "duration".\n` + JSON.stringify(promptResponses);
+          const result = await model.generateContent(prompt);
+          const text = await result.response.text();
         let  newtext   = text.trim();
         if (newtext.startsWith("```")) {
           newtext = newtext.replace(/^```(?:json)?\r?\n/, "").replace(/\r?\n```$/, "").trim();
@@ -125,7 +119,8 @@ const Home = () => {
         } catch {
           recs = [{ activity: newtext, duration: 0 }];
         }
-        setpromptResponses(recs);
+            setpromptResponses(recs);
+            setLoadingRec(false);
       } catch (error) {
         alert("error")
         console.log(error)
@@ -140,14 +135,34 @@ const Home = () => {
     }
     const pastArray = async() => {
       try {
-        const {data} = await axios.post('http://localhost:5001/get-log', {username: [user], range_start: 0, range_end: 3});
+        const {data} = await axios.post('http://localhost:5001/get-log', {username: [user], range_start: 0, range_end: 4});
         console.log('home recent logs:', data.combined);
         setPastWorkouts(data.combined || []);
       } catch (error){
         console.error('No workouts found',error);
       }
-    }
-    pastArray();
+      }
+
+      const getInfo = async () => {
+          try {
+              const info = await axios.post("http://localhost:5001/get-userinfo", { username: user });
+              if (info.data.rows[0].weight !== "null") {
+                  setWeight(info.data.rows[0].weight)
+              }
+              if (info.data.rows[0].age !== "null") {
+                  setAge(info.data.rows[0].age)
+              }
+              if (info.data.rows[0].height!== "null") {
+                  setHeight(info.data.rows[0].height)
+              }
+          } catch (error) {
+              alert(error);
+          }
+      }
+      pastArray();
+      getInfo();
+      
+
   }, [user]);
 
 
@@ -190,8 +205,8 @@ const Home = () => {
     }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
+      e.preventDefault();
+      const calories = await calcCalories(duration, activity,post);
     if (duration <= 0) {
       setError('Duration must be at least 1 minute');
       return;
@@ -209,13 +224,14 @@ const Home = () => {
         day,
         start,
         duration,
-        post
+          post,
+        calories
       });
 
       await axios.post('http://localhost:5001/add-stats', {
         username: user,
           activity,
-            duration,
+            calories,
       });
         const popup = document.getElementById('popup');
         popup.style.display = "flex";
@@ -227,12 +243,24 @@ const Home = () => {
       setPost('');
       setError('');
         setIcon('/images/icons/workout.svg');
-        
+
+        const pastArray = async () => {
+            try {
+                const { data } = await axios.post('http://localhost:5001/get-log', { username: [user], range_start: 0, range_end: 3 });
+                console.log('home recent logs:', data.combined);
+                setPastWorkouts(data.combined || []);
+            } catch (error) {
+                console.error('No workouts found', error);
+            }
+        }
+
+        pastArray();
+
         await delay(3500);
         popup.style.display = "none";
     } catch (error) {
       console.error('Failed to add Workout:', error.response?.data || error);
-      alert('There was an error adding your workout.');
+      alert('There was an error adding your workout. ' + error);
     }
   };
 
@@ -260,6 +288,20 @@ const Home = () => {
             />
           </div>
 
+                  <div>
+                      <label>Duration:</label>
+                      <input
+                          type="number"
+                          name="duration"
+                          min={1}
+                          max={1440}
+                          value={duration}
+                          onChange={e => { setDuration(e.target.value); autoUpdateStart(e.target.value); setError(''); }}
+                          placeholder="Duration (in minutes)"
+                          required
+                      />
+                  </div>
+
           <div>
             <label>Date:</label>
             <input
@@ -281,19 +323,7 @@ const Home = () => {
             />
           </div>
 
-          <div>
-            <label>Duration:</label>
-            <input
-              type="number"
-              name="duration"
-              min ={1}
-              max={1440}
-              value={duration}
-                          onChange={e => { setDuration(e.target.value); autoUpdateStart(e.target.value); setError(''); }}
-              placeholder="Duration (in minutes)"
-              required
-            />
-          </div>
+          
 
           <div>
             <label>Notes:</label>
@@ -318,8 +348,8 @@ const Home = () => {
           : (
             <div className="pastwork">
               {pastWorkouts.map(log => (
-                <div key={log.log_id} className="pastitem">
-                  <strong>{log.activity}</strong> on {log.day.slice(0,10)} at {log.start} for {log.duration} min
+                  <div key={log.log_id} className="pastitem" data-aos="fade-right" data-aos-once="true" >
+                      <strong>{log.activity}</strong> on {log.day.slice(0, 10)} at {log.start.slice(0,5)} for {log.duration} min; {log.calories } kcals burned
                 </div>
               ))}
             </div>
@@ -335,23 +365,37 @@ const Home = () => {
           onClick={getResponseForGivenPrompt}
         >
           Generate New Recs
-        </button>
-        <button
-          className="div-button"
-          onClick={diversifyRecommendations}
-        >
-          Diversify
-        </button>
+                      </button>
+        {promptResponses.length === 0 ? (
+            <></>
+        ) : (
+                <button
+                    className="div-button"
+                    onClick={diversifyRecommendations}
+                >
+                    Diversify
+                </button>
+        )}
+        
       </div>
         {promptResponses.length === 0
-          ? <p>No recommendations yet</p>
+                      ? <>
+                          {
+                          
+                          loadingRec ? (
+                          <p>Loading...</p>
+              ) : (
+                          <p>No recommendations yet</p>
+                      )
+                      
+                      }
+                      </>
           : (
             <div className="pastwork">
               {promptResponses.map((rec, i) => (
-                <div key={i} className="pastitem">
+                  <div key={i} className="pastitem" data-aos="fade-left" data-aos-once="true" data-aos-delay={i*100 }>
                   <strong>{rec.activity}</strong> for {rec.duration} min
                   <br/>
-                  Calories: {calcCalories(rec.duration, rec.activity)} kcal
                 </div>
               ))}
             </div>

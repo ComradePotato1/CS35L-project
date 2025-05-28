@@ -25,6 +25,7 @@ const LogItem = ({
         day: log.day ? log.day.split('T')[0] : '', // format for date input
         start: log.start,
         duration: log.duration,
+        calories: log.calories,
         post: log.post || ''
     });
 
@@ -115,19 +116,17 @@ const LogItem = ({
                             required
                         />
                     </div>
-
-                    <div className="form-group">
-                        <label>Date:</label>
-                        <input
-                            type="date"
-                            name="day"
-                            value={formData.day.substring(0,10)}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
                     <div className="time-group">
+                        <div className="form-group">
+                            <label>Date:</label>
+                            <input
+                                type="date"
+                                name="day"
+                                value={formData.day.substring(0,10)}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
                         <div className="form-group">
                             <label>Start Time:</label>
                             <input
@@ -138,6 +137,9 @@ const LogItem = ({
                                 required
                             />
                         </div>
+                    </div>
+                    <div className="time-group">
+                        
 
                         <div className="form-group">
                             <label>Duration (minutes):</label>
@@ -147,6 +149,19 @@ const LogItem = ({
                                 min="1"
                                 max="1440" // 24 hours
                                 value={formData.duration}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Calories (kcal):</label>
+                            <input
+                                type="number"
+                                name="calories"
+                                min="1"
+                                max="1440" // 24 hours
+                                value={formData.calories}
                                 onChange={handleChange}
                                 required
                             />
@@ -200,7 +215,7 @@ const LogItem = ({
                         <div className="log-meta">
                             <span className="log-date">{log.day.split("T")[0]+ " "}</span>
                             <span className="log-time">
-                                Started at: {log.start} • Duration: {formatDuration(log.duration)}
+                                    Started at: {log.start} • Duration: {formatDuration(log.duration)} • Calories: {log.calories} kcals
                             </span>
                         </div>
                     </div>
