@@ -14,8 +14,8 @@ const Profile = () => {
     profile: '',
     weight: '',
     height: '',
-    dailyGoal: false,
-    weeklyGoal: false
+    age: '',
+    totalCalories: '',
   });
   const [editing, setEditing] = useState(false);
   const [toggleFollower, setToggleFollower] = useState(true) 
@@ -213,7 +213,7 @@ const Profile = () => {
           )}
         </div>
 
-        <div className="profile">
+        {/* <div className="profile">
           <label className="tag">Daily Goal:</label>
           {editing ? (
             <input
@@ -237,8 +237,32 @@ const Profile = () => {
           ) : (
             <span className="val">{info.weeklyGoal ? 'Yes' : 'No'}</span>
           )}
-        </div>
+        </div> */}
+        <div className="profile">
+         <label className="tag">Age:</label>
+         {editing ? (
+           <input
+             type="number"
+             value={info.age}
+             onChange={handleEditing('age')}
+           />
+         ) : (
+           <span className="val">{info.age || '—'}</span>
+         )}
+       </div>
 
+       <div className="profile">
+         <label className="tag">Total Calories Burned:</label>
+         {editing ? (
+           <input
+             type="number"
+             value={info.totalCalories}
+             onChange={handleEditing('totalCalories')}
+           />
+         ) : (
+           <span className="val">{info.totalCalories ? info.totalCalories + ' kcal' : '—'}</span>
+         )}
+       </div>
         <Link to="/logout" className="logout">
           Logout
         </Link>

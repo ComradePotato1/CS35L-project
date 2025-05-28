@@ -6,7 +6,35 @@ import { AuthContext } from "../auth/auth.js";
 import delay from 'delay';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+const met_table = {
+  walk: 3.5,
+  yoga: 2.5,
+  run: 9.8,
+  cycle: 7.5,
+  swim: 8.0,
+  hike: 6.0,
+  row: 7.0,
+  strength: 6.0,
+  dance: 5.5
+};
 
+// choose a MET by checking if the activity string contains one of the keys
+function getMet(activity) {
+  const act = activity.toLowerCase();
+  for (const [key, met] of Object.entries(met_table)) {
+    if (act.includes(key)) return met;
+  }
+  return 3.5;
+}
+
+function calcCalories(timespent, activity) {
+    const default_weight_pounds = 155;
+  const kg = default_weight_pounds/ 2.205;
+  const mymet = getMet(activity);
+  // calories per minute = (MET × 3.5 × weightKg) / 200
+  const calperMin = (mymet * 3.5 * kg) / 200;
+  return Math.round(calperMin * timespent);
+}
 
 const Home = () => {
   const { user } = useContext(AuthContext);
@@ -24,7 +52,8 @@ const Home = () => {
   const [error, setError] = useState('');
   const [icon, setIcon] = useState('/images/icons/workout.svg');
   const [pastWorkouts, setPastWorkouts] = useState([]);
-
+  const [weight, setWeight] = useState(155); //accoridng to google
+  const [height, setHeight] = useState(68);  // according to google
     const [inputValue, setInputValue] = useState('');
     const [promptResponses, setpromptResponses] = useState([]);
 
@@ -34,15 +63,41 @@ const Home = () => {
     );
 
 
+
+
     const getResponseForGivenPrompt = async () => {
         try {            
             const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-            const result = await model.generateContent("can you give me one workout recommendation based on the three past workouts attached below in JSON object format, try diversifying my activities and duration, give me different recommendations \n" + JSON.stringify(pastWorkouts) + " \nReturn only the activity recommendation and the duration");
+            const prompt = `User weight: ${weight} lbs; height: ${height} in.\n` + `Please give me five different workout recommendations based on my recent workouts (JSON below). ` +
+              `Return ONLY a JSON array of objects with keys "activity" (string) and "duration" (number).\n` + JSON.stringify(pastWorkouts);
+            const result = await model.generateContent(prompt);
             setInputValue('')
-            const response = result.response;
+            const response = await result.response;
             const text = response.text();
             console.log(text)
-            setpromptResponses([...promptResponses, text]);
+            let newtext = text.trim();
+
+            if (newtext.startsWith("```")) {
+              newtext = newtext.replace(/^```(?:json)?\r?\n/, "").replace(/\r?\n```$/, "").trim()
+            }
+            
+            const start = newtext.indexOf('[');
+            const end   = newtext.lastIndexOf(']');
+            let finaltext;
+            if (start !== -1 && end !== -1 && end > start) {
+              finaltext = newtext.slice(start, end + 1);
+            } else {
+              finaltext = newtext;
+            }
+
+            let recs;
+            try {
+              recs = JSON.parse(newtext);
+            } catch (err) {
+              console.error("Could not parse AI response:", err);
+              recs = [{ activity: newtext, duration: 0 }];
+            }
+            setpromptResponses(recs);
         }
         catch (error) {
             alert("error")
@@ -50,6 +105,33 @@ const Home = () => {
             console.log("Something Went Wrong");
         }
     }
+
+    const diversifyRecommendations = async () => {
+      if (promptResponses.length === 0) return;
+      try {
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const prompt = `User weight: ${weight} lbs; height: ${height} in.\n` +
+          `Please diversify these workout recommendations by changing their categories (e.g. swap a run for a swim, yoga for a hike, etc). ` +
+          `Return ONLY a JSON array of objects with keys "activity" and "duration".\n` + JSON.stringify(promptResponses);        const result = await model.generateContent(prompt);
+        const text = await result.response.text();
+        let  newtext   = text.trim();
+        if (newtext.startsWith("```")) {
+          newtext = newtext.replace(/^```(?:json)?\r?\n/, "").replace(/\r?\n```$/, "").trim();
+        }
+
+        let recs;
+        try {
+          recs = JSON.parse(newtext);
+        } catch {
+          recs = [{ activity: newtext, duration: 0 }];
+        }
+        setpromptResponses(recs);
+      } catch (error) {
+        alert("error")
+        console.log(error)
+        console.log("Something Went Wrong");
+      }
+    };
 
 
   useEffect(() => {
@@ -228,31 +310,56 @@ const Home = () => {
           <button type="submit">Submit Workout</button>
         </form>
       </section>
-
+    <div className="home-sections">
       <section className="pastworkouts">
-        <h3>
-          Past Workouts
-        </h3>
-        {pastWorkouts.length === 0 ? (
-          <p>No recent workouts</p>): (
-          <div className="pastwork">
-            {pastWorkouts.map(log => (
-              <div key={log.log_id} className="pastitem">
-                <strong>{log.activity}</strong> on {log.day.slice(0, 10)} at {log.start} for {log.duration} min
-              </div>
-            ))}
-          </div>
-          )}
-          </section>
+        <h3>Past Workouts</h3>
+        {pastWorkouts.length === 0
+          ? <p>No recent workouts</p>
+          : (
+            <div className="pastwork">
+              {pastWorkouts.map(log => (
+                <div key={log.log_id} className="pastitem">
+                  <strong>{log.activity}</strong> on {log.day.slice(0,10)} at {log.start} for {log.duration} min
+                </div>
+              ))}
+            </div>
+          )
+        }
+      </section>
 
-          {/*test*/}
-                <button onClick={getResponseForGivenPrompt}>Get Workout recs</button>
-                {promptResponses.map((promptResponse, index) => (
-                  <div key={index} >
-                      <div className={`response-text ${index === promptResponses.length - 1 ? 'fw-bold' : ''}`}>{promptResponse}</div>
-                  </div>
-              ))
-          }
+      <section className="pastworkouts recs">
+        <h3>Recommended Workouts</h3>
+        <div className="big-buttons">
+      <button
+          className="div-button"
+          onClick={getResponseForGivenPrompt}
+        >
+          Generate New Recs
+        </button>
+        <button
+          className="div-button"
+          onClick={diversifyRecommendations}
+        >
+          Diversify
+        </button>
+      </div>
+        {promptResponses.length === 0
+          ? <p>No recommendations yet</p>
+          : (
+            <div className="pastwork">
+              {promptResponses.map((rec, i) => (
+                <div key={i} className="pastitem">
+                  <strong>{rec.activity}</strong> for {rec.duration} min
+                  <br/>
+                  Calories: {calcCalories(rec.duration, rec.activity)} kcal
+                </div>
+              ))}
+            </div>
+          )
+        }
+      </section>
+    </div>
+
     </div>
   );
 };
