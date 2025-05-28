@@ -101,7 +101,7 @@ const LogItem = ({
     }
 
     return (
-        <div className={`log-item ${isEditing ? 'editing' : ''}`}>
+        <div className={`log-item ${isEditing ? 'editing' : ''}`} onDoubleClick={handleReactClick }>
             {isEditing ? (
                 // Edit Mode
                 <form onSubmit={handleSubmit} className="edit-form">
@@ -196,8 +196,17 @@ const LogItem = ({
                     <>
                         {showHeader ? (
                             <>
-                            <img src={"/images/profile/" + profile + ".png"} alt="Profile" style={{ width: "50px", borderRadius: '50%' }}/>
-                            <div classname="log-username">post made by <a href={ "/user/" + log.username }>{log.username}</a>, name {name}</div>
+                                <a href={"/user/" + log.username}>
+                                <div className="log-author">
+                                    
+                                    <img src={"/images/profile/" + profile + ".png"} alt="Profile" style={{ width: "50px", borderRadius: '50%' }} className="log-profile" />
+                                    <div style={{alignContent: "center", textAlign: "left"} }>
+                                        <div className="log-username">{log.username}</div>
+                                        <div className="log-name">{name}</div>
+                                        </div>
+                                    
+                                    </div>
+                                </a>
                             </>
                         ) : (
                             <></>
@@ -211,11 +220,11 @@ const LogItem = ({
                         </span>
                     </div>
                         <div className="log-details">
-                        {log.post && <p className="log-notes">{log.post}</p>}
+                            {log.post && <p className="log-notes" style={{textAlign: "left"} }>{log.post}</p>}
                         <div className="log-meta">
                             <span className="log-date">{log.day.split("T")[0]+ " "}</span>
                             <span className="log-time">
-                                    Started at: {log.start} • Duration: {formatDuration(log.duration)} • Calories: {log.calories} kcals
+                                    Started at: {log.start} • Duration: {formatDuration(log.duration)} • Calories burned: {log.calories} kcals
                             </span>
                         </div>
                     </div>

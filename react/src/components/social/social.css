@@ -2,3 +2,34 @@
     max-width: 1200px;
     margin: 2rem auto;
 }
+
+.log-author {
+    background-color: white;
+    border-bottom: 2px #aaa solid ;
+    display: flex;
+    padding: 0px;
+    margin-bottom: 15px; 
+    transition: background-color 0.2s ease-in;
+    border-radius: 15px 15px 0px 0px
+}
+
+.log-profile {
+    padding: 15px;
+}
+
+.log-username {
+    color: #111;
+    font-size: 1.3em;
+}
+
+.log-name {
+    color: #757575;
+}
+
+a {
+    text-decoration: none;
+}
+
+.log-author:hover {
+    background-color: #eee;
+}
