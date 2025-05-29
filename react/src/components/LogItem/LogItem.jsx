@@ -7,7 +7,8 @@ const LogItem = ({
     isEditing,
     onEdit=null,
     onSave=null,
-    onCancel=null,
+    onCancel = null,
+    onDelete=null,
     onReact,
     onUnreact,
     currentUser,
@@ -44,6 +45,7 @@ const LogItem = ({
         });
     };
 
+
     const handleReactClick = () => {
         if (hasReacted) {
             onUnreact(log.log_id);
@@ -51,6 +53,7 @@ const LogItem = ({
             onReact(log.log_id);
         }
     };
+
 
     const fetchUserData = async (username) => {
         const res = await axios.post('http://localhost:5001/get-userinfo', { username: log.username });
@@ -101,9 +104,9 @@ const LogItem = ({
     }
 
     return (
-        <div className={`log-item ${isEditing ? 'editing' : ''}`} onDoubleClick={handleReactClick }>
+        <div className={`log-item ${isEditing ? 'editing' : ""}`} onDoubleClick={handleReactClick} >
             {isEditing ? (
-                // Edit Mode
+                // Edit Mode 
                 <form onSubmit={handleSubmit} className="edit-form">
                     <div className="form-group">
                         <label>Activity:</label>
@@ -179,6 +182,7 @@ const LogItem = ({
                     </div>
 
                     <div className="form-actions">
+                        <button type="button" onClick={onDelete } className="delete-btn">Delete Log</button>
                         <button type="submit" className="save-btn">
                             Save Changes
                         </button>

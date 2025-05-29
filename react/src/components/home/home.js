@@ -32,6 +32,7 @@ const Home = () => {
     const [weight, setWeight] = useState(155) //accoridng to google
     const [height, setHeight] = useState(68);  // according to google
     const [age, setAge] = useState(20);
+    const [gender, setGender] = useState("prefer not to say");
     const [loadingRec, setLoadingRec] = useState(false);
 
     useEffect(() => {
@@ -46,7 +47,7 @@ const Home = () => {
     const calcCalories = async (timespent, activity, post) => {
         try {
             const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-            const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} activity: ${activity} time spent: ${timespent} minutes notes(if any): ${post}\n` + "an integer estimate of how much kcal the user burned based on the information given above, return only a number and nothing else";
+            const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} gender: ${gender} activity: ${activity} time spent: ${timespent} minutes notes(if any): ${post}\n` + "an integer estimate of how much kcal the user burned based on the information given above, return only a number and nothing else";
             const result = await model.generateContent(prompt);
             const response = await result.response;
             return parseInt(response.text());
@@ -59,7 +60,7 @@ const Home = () => {
         try {
             setLoadingRec(true);
             const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-            const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age}\n` + `Please give me three different workout recommendations based on my recent workouts (JSON below). ` +
+            const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} gender: ${gender} \n` + `Please give me three different workout recommendations based on my recent workouts (JSON below). ` +
               `Return ONLY a JSON array of objects with keys "activity" (string) and "duration" (number).\n` + JSON.stringify(pastWorkouts);
             const result = await model.generateContent(prompt);
             const response = await result.response;
@@ -103,7 +104,7 @@ const Home = () => {
             setLoadingRec(true);
             setpromptResponses([]);
         const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-        const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} \n` +
+            const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} gender: ${gender}  \n` +
           `Please diversify these workout recommendations by changing their categories (e.g. swap a run for a swim, yoga for a hike, etc). ` +
               `Return ONLY a JSON array of objects with keys "activity" and "duration".\n` + JSON.stringify(promptResponses);
           const result = await model.generateContent(prompt);
@@ -155,6 +156,7 @@ const Home = () => {
               if (info.data.rows[0].height!== "null") {
                   setHeight(info.data.rows[0].height)
               }
+              setGender(info.data.rows[0].gender)
           } catch (error) {
               alert(error);
           }

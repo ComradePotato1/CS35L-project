@@ -15,6 +15,7 @@ const Social = () => {
     const [followLogs, setFollowLogs] = useState([]);
     const [followerLogs, setFollowerLogs] = useState([]);
     const [page, setPage] = useState(0);
+    const [editingLogId, setEditingLogId] = useState(null);
     const ITEMS_PER_PAGE = 3;
 
     const getRecs = async () => {
@@ -64,6 +65,45 @@ const Social = () => {
     }, []);
 
     //copied from history.jsx
+    const handleDelete = async (logId) => {
+        try {
+            await axios.post('http://localhost:5001/delete-log', {
+                log_id: logId
+            });
+
+            fetchFollowLogs();
+        } catch (err) {
+            alert(err);
+            console.error("error");
+        }
+    };
+
+    const handleSaveLog = async (logData) => {
+        try {
+            const response = await axios.post('http://localhost:5001/log', {
+                ...logData,
+                username: user
+            });
+
+            // Optimistic UI update instead of full refresh
+            setFollowLogs(prevLogs =>
+                logData.log_id
+                    ? prevLogs.map(log =>
+                        log.log_id === logData.log_id
+                            ? { ...log, ...logData }
+                            : log
+                    )
+                    : [...prevLogs, { ...logData, log_id: response.data.log_id }]
+            );
+
+            setEditingLogId(null);
+        } catch (err) {
+            console.error("Save failed:", err);
+            alert(err.response?.data?.error || "Failed to save");
+            fetchFollowLogs()
+        }
+    };
+
 
     const fetchRecLogs = async () => {
         try {
@@ -111,6 +151,8 @@ const Social = () => {
             console.error("Failed to fetch logs:", err);
         }
     };
+
+
     useEffect(() => {
         fetchRecLogs();
         fetchFollowLogs();
@@ -207,7 +249,11 @@ const Social = () => {
                                 <LogItem
                                     key={log.log_id}
                                     log={log}
-                                    isEditing={false}
+                                    isEditing={editingLogId === log.log_id}
+                                    onEdit={() => setEditingLogId(log.log_id)}
+                                    onSave={handleSaveLog}
+                                    onCancel={() => setEditingLogId(null)}
+                                    onDelete={() => handleDelete(log.log_id)}
                                     onReact={handleReact}
                                     onUnreact={handleUnreact}
                                     currentUser={user}

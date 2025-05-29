@@ -37,7 +37,7 @@ const workoutCategories = {
 };
 
 pool.query(`USE ${process.env.DB_NAME}`);
-pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), profile VARCHAR(255) DEFAULT 'pic-0', weight SMALLINT(15), height SMALLINT(15), age SMALLINT(15), social BOOLEAN DEFAULT TRUE )");
+pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), profile VARCHAR(255) DEFAULT 'pic-0', weight SMALLINT(15), height SMALLINT(15), age SMALLINT(15), social BOOLEAN DEFAULT TRUE, gender VARCHAR(255) DEFAULT 'prefer not to say' )");
 pool.query("CREATE TABLE IF NOT EXISTS stats ( username VARCHAR (255), aerobic SMALLINT(15) DEFAULT 0, stretching SMALLINT(15) DEFAULT 0 , strengthening SMALLINT(15) DEFAULT 0, balance SMALLINT(15) DEFAULT 0, rest SMALLINT(15) DEFAULT 0 , other SMALLINT(15) DEFAULT 0 )");
 pool.query(`CREATE TABLE IF NOT EXISTS log (log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME, duration INT, post VARCHAR(255), calories INT)`); 
 pool.query("CREATE TABLE IF NOT EXISTS react ( log_id INT, username VARCHAR(255) )");
@@ -136,10 +136,10 @@ app.post('/change-password', async (req, res) => {
 
 app.post('/update-profile', async (req, res) => {
     try {
-        const { username, name, profile, weight, height, age, social } = req.body;
+        const { username, name, profile, weight, height, age, social, gender } = req.body;
         await pool.execute(
-            'UPDATE users SET name = ?, profile = ?, weight = ?, height = ?, age = ?, social = ? WHERE username = ?',
-            [name, profile, weight, height, age, social, username]
+            'UPDATE users SET name = ?, profile = ?, weight = ?, height = ?, age = ?, social = ?, gender = ? WHERE username = ?',
+            [name, profile, weight, height, age, social, gender, username]
         );
 
         res.json({ message: 'Update successful' });
@@ -208,12 +208,19 @@ app.post('/log', async (req, res) => {
 app.post('/get-log', async (req, res) => {
     try {
         const { username, range_start, range_end } = req.body;
-        const placeholders = username.map(() => '?').join(',');
-        const [rows] = await pool.execute(
-            'SELECT * FROM log WHERE username in (' + placeholders + ') ORDER BY timestamp DESC',
-            [...username]
-        );
-
+        let row
+        if (username === "admin") {
+            [rows] = await pool.execute(
+                'SELECT * FROM log WHERE username=? ORDER BY timestamp DESC',
+                [username]
+            );
+        } else {
+            const placeholders = username.map(() => '?').join(',');
+            [rows] = await pool.execute(
+                'SELECT * FROM log WHERE username in (' + placeholders + ') ORDER BY timestamp DESC',
+                [...username]
+            );
+        }
         if (rows.length === 0) {
             return res.status(401).json({ error: 'Username not found' });
         }
@@ -263,6 +270,29 @@ app.post('/refresh-stats', async (req, res) => {
       res.status(200).json({ message: "refresh success" });
     } catch (error) {
       res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/refresh-stats-for', async (req, res) => {
+    try {
+        const { username } = req.body;
+        await pool.execute("DELETE FROM stats WHERE username=?", [username]);
+        await pool.execute('INSERT INTO stats (username, aerobic, stretching, strengthening, balance, rest, other) VALUES (?, 0, 0, 0, 0, 0, 0)', [username]);
+        const [result] = await pool.execute("SELECT * FROM log WHERE username = ?", [username]);
+        for (let i = 0; i < result.length; i++) {
+            const lower = result[i].activity.toLowerCase();
+            for (const [cat, keywords] of Object.entries(workoutCategories)) {
+                if (keywords.some(keyword => lower.includes(keyword))) {
+                    await pool.execute(
+                        `UPDATE stats SET ${cat} = ${cat} + ? WHERE username = ?`,
+                        [result[i].calories, result[i].username]
+                    );
+                }
+            }
+        }
+        res.status(200).json({ message: "refresh success" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 
@@ -533,13 +563,30 @@ app.post('/update-log', async (req, res) => {
     try {
         const { log_id, activity, post, day, start, duration } = req.body;
 
-        await pool.executes(
+        await pool.execute(
             `UPDATE log
             SET activity = ?, post = ?, day = ?, start = ?, duration = ?, calories = ?
             WHERE log_id = ?`,
             [activity, post, day, start, duration, calories, log_id]
         );
         res.status(200).json({ message: 'Log updated successfully' });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Failed to update log',
+            details: error.message
+        });
+    }
+});
+
+app.post('/delete-log', async (req, res) => {
+    try {
+        const { log_id } = req.body;
+
+        await pool.execute(
+            `DELETE FROM log WHERE log_id=?`,
+            [log_id]
+        );
+        res.status(200).json({ message: 'Log deleted successfully' });
     } catch (error) {
         res.status(500).json({
             error: 'Failed to update log',

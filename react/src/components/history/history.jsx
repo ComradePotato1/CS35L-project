@@ -5,7 +5,11 @@ import LogItem from '../LogItem/LogItem.jsx';
 import "./history.css"
 import { AuthContext } from "../auth/auth";
 import '../../App.css';
-import {Radar, RadarChart,PolarGrid,PolarAngleAxis,PolarRadiusAxis } from 'recharts';
+import { Pie, Sector, PieChart } from 'recharts';
+import {ComposedChart, Area, Bar,    XAxis,    YAxis,    CartesianGrid,    Tooltip,    Legend,    Scatter,    ResponsiveContainer,} from 'recharts';
+
+import AOS from 'aos'
+import 'aos/dist/aos.css';
 
 const History = () => {
   const { user } = useContext(AuthContext);
@@ -13,8 +17,13 @@ const History = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [editingLogId, setEditingLogId] = useState(null);
-  const [data, setData] = useState([]);
+    const [data, setData] = useState([]);
+    const [mostRecent, setMostRecent] = useState([]);
   const ITEMS_PER_PAGE = 7;
+
+    useEffect(() => {
+        AOS.init({ duration: 1000 });
+    }, []);
 
   // Fetch logs from backend
   const fetchLogs = async () => {
@@ -36,7 +45,9 @@ const History = () => {
   useEffect(() => {
     if (user) {
       fetchLogs();
-      getStats();
+        getStats();
+        getMostRecent();
+        
     }
   }, [user, page]);
 
@@ -46,6 +57,10 @@ const History = () => {
         ...logData,
         username: user
       });
+
+        await axios.post('http://localhost:5001/refresh-stats-for', {
+            username: user
+        });
   
       // Optimistic UI update instead of full refresh
       setLogs(prevLogs => 
@@ -94,7 +109,20 @@ const handleUnreact = async (logId) => {
     } catch (err) {
         console.error("Reaction failed:", err);
     }
-};
+    };
+
+    const handleDelete = async (logId) => {
+        try {
+            await axios.post('http://localhost:5001/delete-log', {
+                log_id: logId
+            });
+            
+            fetchLogs();
+        } catch (err) {
+            alert(err);
+            console.error("error");
+        }
+    };
 
 const getStats = async () => {
   try {
@@ -115,7 +143,7 @@ const getStats = async () => {
         fullMark: 100,
       },
       {
-        activity: "Strengthening",
+        activity: "Strengthen",
         A: (stat.strengthening / sum * 100),
         fullMark: 100,
       },
@@ -144,53 +172,168 @@ const getStats = async () => {
 //example https://codesandbox.io/p/sandbox/simple-radar-chart-2p5sxm
 
 
+    const getMostRecent = async () => {
+        try {
+            let response = await axios.post('http://localhost:5001/get-log', {
+                username: [user],
+                range_start: 0,
+                range_end: 10
+            });
+            
+            const formattedData = response.data.combined.map((item, index) => ({
+                activity: `${item.activity} ${index}`,
+                calories: item.calories,
+                duration: item.duration
+            }));
+
+            setMostRecent(formattedData); 
+        } catch (err) {
+            alert(err);
+            console.error("get failed:", err);
+        }
+    }
+
+    useEffect(() => {
+        try {
+            console.log(mostRecent);
+        } catch (err) {
+            alert(err);
+        }
+        
+    }, [mostRecent]);
+
+    const renderActiveShape = (props) => {
+        const RADIAN = Math.PI / 180;
+        const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent, value } = props;
+
+        const sin = Math.sin(-RADIAN * midAngle);
+        const cos = Math.cos(-RADIAN * midAngle);
+        const sx = cx + (outerRadius + 10) * cos;
+        const sy = cy + (outerRadius + 10) * sin;
+        const mx = cx + (outerRadius + 30) * cos;
+        const my = cy + (outerRadius + 30) * sin;
+        const ex = mx + (cos >= 0 ? 1 : -1) * 22;
+        const ey = my;
+        const textAnchor = cos >= 0 ? 'start' : 'end';
+
+        return (
+            <g>
+                <text x={cx} y={cy} dy={8} textAnchor="middle" fill="#000" style={{fontWeight:"bold"} }>
+                    Activity Distribution
+                </text>
+                <Sector
+                    cx={cx}
+                    cy={cy}
+                    innerRadius={innerRadius}
+                    outerRadius={outerRadius}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    fill={fill}
+                />
+                <Sector
+                    cx={cx}
+                    cy={cy}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    innerRadius={outerRadius + 6}
+                    outerRadius={outerRadius + 10}
+                    fill={fill}
+                />
+                <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
+                <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
+                <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${payload.activity}`}</text>
+                <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
+                    {`${(percent * 100).toFixed(2)}%`}
+                </text>
+            </g>
+        );
+    };
+
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    const onPieEnter = (_, index) => {
+        setActiveIndex(index);
+    };
+
+
   if (!user) return <p>Please log in to view history</p>;
   if (loading) return <div className="loading">Loading...</div>;
 
+  
+
   return (
       <div className="history-container">
-      <h2>Your Workout History</h2>
-      <RadarChart
-        cx={300}
-        cy={250}
-        outerRadius={150}
-        width={700}
-        height={500}
-        data={data}
-        style={{marginLeft:"auto"}}
-        
-      >
-        <PolarGrid stroke="#111" />
-        <PolarAngleAxis dataKey="activity" />
-        <PolarRadiusAxis type="number" domain={[-10,100]} />
-        <Radar
-          name={user}
-          dataKey="A"
-          stroke="#55aadd"
-          fill="#4499cc"
-                  fillOpacity={0.6}
-                  strokeWidth="3.5"
-        />
-          </RadarChart>
+          <div classNmae="history-graphs" style={{borderRight:"solid 1px #eee", marginRight: "2em"} }>
 
+              <h2>Workout Statistics</h2>
+
+              <PieChart width={550} height={400} style={{ marginLeft: "0", position: "sticky", top: "90px" }}>
+                  <Pie
+                      activeIndex={activeIndex}
+                      data={data}
+                      dataKey="A"
+                      innerRadius={100}
+                      outerRadius={150}
+                      cx="50%"
+                      fill="#4499cc"
+                      onMouseEnter={onPieEnter}
+                      activeShape={renderActiveShape}
+
+                  >
+                  </Pie>
+              </PieChart>
+
+              <h3 style={{position: "sticky", top: "450px" }}>Summary of most recent {mostRecent.length} workouts</h3>
+              {mostRecent.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300} style={{ marginLeft: "0", position: "sticky", top: "475px" }}>
+                  <ComposedChart
+                      width={500}
+                      height={400}
+                      data={mostRecent}
+                      margin={{
+                          top: 20,
+                          right: 20,
+                          bottom: 20,
+                          left: 20,
+                      }}
+                  >
+                      <CartesianGrid stroke="#f5f5f5" />
+                      <XAxis dataKey="activity" scale="band" />
+                          <YAxis yAxisId="left" />
+                          <YAxis yAxisId="right" orientation="right" />
+                      <Tooltip />
+                      <Legend />
+                      <Area yAxisId="left" type="monotone" dataKey="calories" fill="#8884d8" stroke="#8884d8" />
+                      <Bar yAxisId="right" name="Duration" dataKey="duration" barSize={20} fill="#413ea0" />
+
+
+                  </ComposedChart>
+              </ResponsiveContainer>
+              ) : ("")}
+          </div>
+          <div className="history-logs">
+
+         
+          <h2>Your Workout History</h2>
       {logs.length === 0 ? (
         <p>No workouts recorded yet</p>
       ) : (
         <>
-          <div className="log-list">
+                <div className="log-list" >
               
-                  {logs.slice(0, ITEMS_PER_PAGE).map((log) => (
-                      <div className="log" id={log.log_id }>
+                  {logs.slice(0, ITEMS_PER_PAGE).map((log, index) => (
+                      <div className="log" id={log.log_id} data-aos="fade-up" data-aos-once="true" data-aos-delay={index * 50}>
                   <LogItem
                     key={log.log_id}
                     log={log}
                     isEditing={editingLogId === log.log_id}
                     onEdit={() => setEditingLogId(log.log_id)}
                     onSave={handleSaveLog}
-                    onCancel={() => setEditingLogId(null)}
+                        onCancel={() => setEditingLogId(null)}
+                        onDelete={() => handleDelete(log.log_id) }
                         onReact={handleReact}
                         onUnreact={handleUnreact}
-                    currentUser={user}
+                              currentUser={user}
                           />
                       </div>
                 ))}
@@ -215,7 +358,8 @@ const getStats = async () => {
           </div>
         </>
       )}
-    </div>
+          </div>
+      </div>
   );
 };
 

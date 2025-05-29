@@ -18,8 +18,18 @@
     margin: 2rem auto;
     padding: 0 1rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+
   }
-  
+
+.history-graphs {
+    flex-grow: 1;    
+}
+
+.history-logs {
+    flex-grow: 1;
+}
+
   .loading {
     text-align: center;
     font-size: 1.2rem;
@@ -31,6 +41,7 @@
     display: grid;
     gap: 1.5rem;
     margin: 2rem 0;
+    width: 100%;
   }
   
   .log-item {
@@ -39,9 +50,19 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+
   }
+
+.log-item-highlight {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: solid 10px yellow;
+}
   
-  .log-item:hover {
+  .log-item:hover, .log-item-highlight:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   }
@@ -180,12 +201,12 @@
     background: #27ae60;
   }
   
-  .cancel-btn {
+  .delete-btn {
     background: #e74c3c;
     color: white;
   }
   
-  .cancel-btn:hover {
+  .delete-btn:hover {
     background: #c0392b;
   }
   

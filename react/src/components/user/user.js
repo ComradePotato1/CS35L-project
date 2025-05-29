@@ -58,7 +58,18 @@ const User = () => {
             console.error("Reaction failed:", err);
         }
     };
+    const handleDelete = async (logId) => {
+        try {
+            await axios.post('http://localhost:5001/delete-log', {
+                log_id: logId
+            });
 
+            fetchLogs();
+        } catch (err) {
+            alert(err);
+            console.error("error");
+        }
+    };
 
     const handleSaveLog = async (logData) => {
         try {
@@ -214,6 +225,7 @@ const User = () => {
                                 onEdit={() => setEditingLogId(log.log_id)}
                                 onSave={handleSaveLog}
                                 onCancel={() => setEditingLogId(null)}
+                                onDelete={() => handleDelete(log.log_id) }
                                 onReact={handleReact}
                                 onUnreact={handleUnreact}
                                 currentUser={user}
