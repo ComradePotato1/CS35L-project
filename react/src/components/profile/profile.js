@@ -14,17 +14,18 @@ const Profile = () => {
     profile: '',
     weight: '',
     height: '',
-      age: '',
-      social: true,
+    age: '',
+    gender: '',
+    social: true,
   });
   const [editing, setEditing] = useState(false);
   const [toggleFollower, setToggleFollower] = useState(true) 
-  //const [isOpen, setIsOpen] = useState(false);
   const profileOptions = ['pic-0', 'pic-1', 'pic-2', 'pic-3'];
 
-  // follower/following state
   const [followersList, setFollowersList] = useState([]);
   const [followingList, setFollowingList] = useState([]);
+  const [followerInfo, setFollowerInfo] = useState({});
+  const [followingInfo, setFollowingInfo] = useState({});
 
   useEffect(() => {
     if (!user) return;
@@ -43,7 +44,20 @@ const Profile = () => {
     const getFollowers = async () => {
       try {
         const res = await axios.post('http://localhost:5001/get-follower', { followee: user });
-        setFollowersList(res.data.result || []);
+        const followers = res.data.result || [];
+        setFollowersList(followers);
+        
+        // Fetch info for each follower
+        const followerInfoMap = {};
+        for (const follower of followers) {
+          try {
+            const infoRes = await axios.post('http://localhost:5001/get-userinfo', { username: follower });
+            followerInfoMap[follower] = infoRes.data.rows[0];
+          } catch (err) {
+            console.error(`Could not fetch info for follower ${follower}:`, err);
+          }
+        }
+        setFollowerInfo(followerInfoMap);
       } catch (err) {
         console.error('Get followers failed:', err);
       }
@@ -51,7 +65,20 @@ const Profile = () => {
     const getFollowing = async () => {
       try {
         const res = await axios.post('http://localhost:5001/get-followee', { follower: user });
-        setFollowingList(res.data.result || []);
+        const following = res.data.result || [];
+        setFollowingList(following);
+        
+        // Fetch info for each following
+        const followingInfoMap = {};
+        for (const followee of following) {
+          try {
+            const infoRes = await axios.post('http://localhost:5001/get-userinfo', { username: followee });
+            followingInfoMap[followee] = infoRes.data.rows[0];
+          } catch (err) {
+            console.error(`Could not fetch info for following ${followee}:`, err);
+          }
+        }
+        setFollowingInfo(followingInfoMap);
       } catch (err) {
         console.error('Get following failed:', err);
       }
@@ -86,17 +113,17 @@ const Profile = () => {
         profile:    info.profile,
         weight:     info.weight,
         height:     info.height,
-          age: info.age,
-        social: info.social,
+        age:       info.age,
+        gender:    info.gender,
+        social:    info.social,
       });
-        setEditing(false);
-        const popup = document.getElementById('popup');
-        popup.style.display = "flex";
-        await delay(4900);
-        popup.style.display = "none";
+      setEditing(false);
+      const popup = document.getElementById('popup');
+      popup.style.display = "flex";
+      await delay(4900);
+      popup.style.display = "none";
     } catch (err) {
       console.error('Could not update profile', err.response);
-
     }
   };
 
@@ -135,171 +162,195 @@ const Profile = () => {
   }
 
   return (
-      <>
-            <div className="popup" id="popup"><span class="popuptext">Edit Profile Success!</span></div>
-          <div className={editing ? 'profilepage editing' : 'profilepage'}>
-              
-        <h2>Your Profile</h2>
-
-        <div className="profilepicpreview" style={{ cursor: 'pointer' }}> {/* onClick={toggleDropdown} */}
-          <img src={"/images/profile/" + info.profile + ".png"} alt="Profile" style={{ borderRadius: '50%' }}/>
-        </div>
-
-        {editing && (
-          <div className="profile-dropdown-menu">
-            {profileOptions.map((profile) => (
-              <img
-                key={profile}
-                src={`/images/profile/${profile}.png`}
-                alt={`Profile ${profile}`}
-                style={{width: '50px', borderRadius: '50%', cursor: 'pointer', margin: '10px', border: info.profile === profile ? '2px solid #4499cc' : 'none'}}
-                onClick={() => handleProfileSelect(profile)}
-              />
-            ))}
-          </div>
-        )}
-
-        <button className="editbutton" onClick={() => setEditing(!editing)}>
-          {editing ? 'Cancel' : 'Edit'}
-        </button>
-
-        {editing && (
-          <button className="savebutton" onClick={handleSaveEdits}>
-            Save Changes
-          </button>
-        )}
-
-        <div className="profile">
-          <label className="tag">Username:</label>
-          <span className="val">{info.username}</span>
-        </div>
-
-        <div className="profile">
-          <label className="tag">Name:</label>
-          {editing ? (
-            <input
-              type="text"
-              value={info.name}
-              onChange={handleEditing('name')}
-            />
-          ) : (
-            <span className="val">{info.name || info.username}</span>
-          )}
-        </div>
-
-        <div className="profile">
-          <label className="tag">Weight (lbs):</label>
-          {editing ? (
-            <input
-              type="number"
-              value={info.weight}
-              onChange={handleEditing('weight')}
-            />
-          ) : (
-            <span className="val">{info.weight || '—'}</span>
-          )}
-        </div>
-
-        <div className="profile">
-          <label className="tag">Height (in):</label>
-          {editing ? (
-            <input
-              type="number"
-              value={info.height}
-              onChange={handleEditing('height')}
-            />
-          ) : (
-            <span className="val">{info.height || '—'}</span>
-          )}
-        </div>
-
-        {/* <div className="profile">
-          <label className="tag">Daily Goal:</label>
-          {editing ? (
-            <input
-              type="checkbox"
-              checked={info.dailyGoal}
-              onChange={handleEditingBox('dailyGoal')}
-            />
-          ) : (
-            <span className="val">{info.dailyGoal ? 'Yes' : 'No'}</span>
-          )}
-        </div>
-
-        <div className="profile">
-          <label className="tag">Weekly Goal:</label>
-          {editing ? (
-            <input
-              type="checkbox"
-              checked={info.weeklyGoal}
-              onChange={handleEditingBox('weeklyGoal')}
-            />
-          ) : (
-            <span className="val">{info.weeklyGoal ? 'Yes' : 'No'}</span>
-          )}
-        </div> */}
-        <div className="profile">
-         <label className="tag">Age:</label>
-         {editing ? (
-           <input
-             type="number"
-             value={info.age}
-             onChange={handleEditing('age')}
-           />
-         ) : (
-           <span className="val">{info.age || '—'}</span>
-         )}
-       </div>
-
-        <Link to="/logout" className="logout">
-          Logout
-        </Link>
+    <>
+      <div className="popup-home" id="popup">
+        <span className="popuptext">Success!</span>
       </div>
-
-      {/* followers & following moved outside */}
-      <div className="followsection">
-        {toggleFollower ? (
-          <div className="followersbox">
-            <div style={{display:"flex", flex:"1 1 100%", flexWarp:"warp"}}>
-              <button onClick={() => changeToggleFollower(true)} id="followerButton" className="toggleFollowButton" style={{ borderBottom: "solid 0.5em #4499cc"} } ><h3>Followers</h3></button>
-              <button onClick={() => changeToggleFollower(false)} id="followingButton" className="toggleFollowButton"><h3>Following</h3></button>
-            </div>
-            <span className="followList">
-            {followersList.length === 0 ? (
-                              <p id="follow">No followers</p>
-            ) : (
-                <ul id="follow">
-                {followersList.map(f => (
-                  <li key={f}><a href={"/user/" + f}>{f}</a></li>
-                ))}
-              </ul>
-                          )}
-          </span>
+      
+      <div className="page">
+        <div className="welcome-section">
+          <img 
+            src={"/images/profile/" + info.profile + ".png"} 
+            alt="Profile" 
+            className="home-icon"
+            style={{ borderRadius: '50%' }}
+          />
+          <h2>Your Profile</h2>
         </div>
-        ) : (
-          <div className="followingbox">
-            <div style={{display:"flex", flex:"1 1 100%", flexWarp:"warp"}}>
-                <button onClick={() => changeToggleFollower(true)} id="followerButton" className="toggleFollowButton"><h3>Followers</h3></button>
-                              <button onClick={() => changeToggleFollower(false)} id="followingButton" className="toggleFollowButton" style={{ borderBottom: "solid 0.5em #4499cc" }}><h3>Following</h3></button>
-                          </div>
 
-            {followingList.length === 0 ? (
-                              <p id="follow">Not following anyone</p>
-                          ) : (
-                        
-                                  <ul id="follow">
-                            {followingList.map(f => (
-                                <li key={f}><a href={"/user/" + f}>{f}</a></li>
-                            ))}
-                                </ul>
-                       
-              
-                              )}
+        <div className="profile-section">
+          {editing && (
+            <div className="profile-dropdown-menu">
+              {profileOptions.map((profile) => (
+                <img
+                  key={profile}
+                  src={`/images/profile/${profile}.png`}
+                  alt={`Profile ${profile}`}
+                  style={{
+                    width: '50px', 
+                    borderRadius: '50%', 
+                    cursor: 'pointer', 
+                    margin: '10px', 
+                    border: info.profile === profile ? '2px solid #4499cc' : 'none'
+                  }}
+                  onClick={() => handleProfileSelect(profile)}
+                />
+              ))}
+            </div>
+          )}
+
+          <div className="profile-actions">
+            <button className="editbutton" onClick={() => setEditing(!editing)}>
+              {editing ? 'Cancel' : 'Edit'}
+            </button>
+
+            {editing && (
+              <button className="savebutton" onClick={handleSaveEdits}>
+                Save Changes
+              </button>
+            )}
           </div>
-        )}
-        
 
-        
+          <div className="profile-grid">
+            <div className="profile">
+              <label className="tag">Username:</label>
+              <span className="val">{info.username}</span>
+            </div>
+
+            <div className="profile">
+              <label className="tag">Name:</label>
+              {editing ? (
+                <input
+                  type="text"
+                  value={info.name}
+                  onChange={handleEditing('name')}
+                />
+              ) : (
+                <span className="val">{info.name || info.username}</span>
+              )}
+            </div>
+
+            <div className="profile">
+              <label className="tag">Weight (lbs):</label>
+              {editing ? (
+                <input
+                  type="number"
+                  value={info.weight}
+                  onChange={handleEditing('weight')}
+                />
+              ) : (
+                <span className="val">{info.weight || '—'}</span>
+              )}
+            </div>
+
+            <div className="profile">
+              <label className="tag">Height (in):</label>
+              {editing ? (
+                <input
+                  type="number"
+                  value={info.height}
+                  onChange={handleEditing('height')}
+                />
+              ) : (
+                <span className="val">{info.height || '—'}</span>
+              )}
+            </div>
+
+            <div className="profile">
+              <label className="tag">Age:</label>
+              {editing ? (
+                <input
+                  type="number"
+                  value={info.age}
+                  onChange={handleEditing('age')}
+                />
+              ) : (
+                <span className="val">{info.age || '—'}</span>
+              )}
+            </div>
+
+            <div className="profile">
+              <label className="tag">Gender:</label>
+              {editing ? (
+                <select
+                  value={info.gender}
+                  onChange={handleEditing('gender')}
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              ) : (
+                <span className="val">{info.gender || '—'}</span>
+              )}
+            </div>
+          </div>
+
+          <Link to="/logout" className="logout">
+            Logout
+          </Link>
+        </div>
+
+        <div className="followsection">
+          <div style={{display: "flex", width: "100%"}}>
+            <button 
+              onClick={() => changeToggleFollower(true)} 
+              id="followerButton" 
+              className="toggleFollowButton" 
+              style={{ borderBottom: toggleFollower ? "solid 0.5em #4499cc" : undefined }}
+            >
+              <h3>Followers</h3>
+            </button>
+            <button 
+              onClick={() => changeToggleFollower(false)} 
+              id="followingButton" 
+              className="toggleFollowButton"
+              style={{ borderBottom: !toggleFollower ? "solid 0.5em #4499cc" : undefined }}
+            >
+              <h3>Following</h3>
+            </button>
+          </div>
+          <div className={toggleFollower ? "followersbox" : "followingbox"}>
+            <span className="followList">
+              {toggleFollower ? (
+                followersList.length === 0 ? (
+                  <p id="follow">No followers yet</p>
+                ) : (
+                  <ul id="follow">
+                    {followersList.map(f => (
+                      <li key={f}>
+                        <Link to={`/user/${f}`}>
+                          {f}
+                          {followerInfo[f]?.name && (
+                            <i> ({followerInfo[f].name})</i>
+                          )}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )
+              ) : (
+                followingList.length === 0 ? (
+                  <p id="follow">Not following anyone yet</p>
+                ) : (
+                  <ul id="follow">
+                    {followingList.map(f => (
+                      <li key={f}>
+                        <Link to={`/user/${f}`}>
+                          {f}
+                          {followingInfo[f]?.name && (
+                            <i> ({followingInfo[f].name})</i>
+                          )}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )
+              )}
+            </span>
+          </div>
+        </div>
       </div>
     </>
   );

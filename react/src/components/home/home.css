@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
 :root {
     --stanwidth: 15rem;
     --stanheight: 3rem;
@@ -10,23 +12,41 @@
   }
   
   .page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
     padding: 2rem;
+    font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  .welcome-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #f6f9fc 0%, #ffffff 100%);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .welcome-section h2 {
+    font-weight: 600;
+    font-size: 1.75rem;
+    color: #2d3748;
   }
   
   .home-icon {
-    width: 4rem;
-    height: 4rem;
-    margin-bottom: 1rem;
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
   }
   
   .workout {
-    width: 100%;
-    max-width: 80rem;
-    text-align: center;
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
     margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   }
   
   .workout h3 {
@@ -36,74 +56,158 @@
   }
   
   .form {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: var(--gap);
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
   }
   
-  .form > div {
+  .form div {
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .form div.notes-field {
+    grid-column: 1 / -1;
   }
   
   .form label {
-    font-size: var(--largefontsize);
-    margin-bottom: 0.25rem;
-    color: #444;
+    font-weight: 500;
+    color: #4a5568;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.01em;
   }
   
-  /* Ensure input and textarea use the same font (monospace to match comments) */
-  .form input,
-  .form textarea {
-    font-size: var(--largefontsize);
-    height: var(--stanheight);
-    width: var(--stanwidth);
-    border-radius: var(--stanbradius);
-    padding: 0.5rem;
-    border: none;
-    box-shadow: var(--stanhadow);
-    opacity: 0.9;
+  .form input, .form textarea {
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    font-family: 'Inter', sans-serif;
   }
   
   .form textarea {
-    height: auto;
-    min-height: var(--stanheight);
+    min-height: 100px;
+    resize: vertical;
   }
-
-  .form input:hover {
-    background-color: #eef6fb; /* soft blue background */
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* subtle shadow */
-    border: 1px solid #4499cc; /* light blue border */
-    transition: background-color 0.1s ease, box-shadow 0.1s ease, border 0.1s ease;
+  
+  .form input:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
   }
-
+  
   .form button {
-    height: var(--stanheight);
-    padding: 0 1rem;
-    border-radius: var(--stanbradius);
-    font-size: var(--largefontsize);
-    background-color: var(--buttonback);
-    color: #fff;
-    font-weight: bold;
+    background: #4299e1;
+    color: white;
+    padding: 0.75rem 1.5rem;
     border: none;
-    box-shadow: var(--buttonshadow);
+    border-radius: 8px;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    transition: background-color 0.2s;
+    grid-column: 1 / -1;
   }
-
+  
   .form button:hover {
-    background-color: #3377aa; /* slightly darker blue */
-    transform: translateY(-1px);
-    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.1);
+    background: #3182ce;
   }
-
+  
+  .home-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  .pastworkouts {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .pastworkouts h3 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+  }
+  
+  .pastwork {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .pastitem {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #4299e1;
+    transition: transform 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .pastitem:hover {
+    transform: translateX(4px);
+  }
+  
+  .big-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .div-button {
+    background: #4299e1;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex: 1;
+  }
+  
+  .div-button:hover {
+    background: #3182ce;
+    transform: translateY(-1px);
+  }
+  
+  .popup-home {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #48bb78;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    animation: slideIn 0.3s ease-out;
+    z-index: 1000;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
   .errors {
-    width: 100%;
-    text-align: center;
-    color: red;
+    color: #e53e3e;
     margin-top: 0.5rem;
+    font-size: 0.875rem;
   }
   
   @media (max-width: 600px) {
@@ -117,128 +221,3 @@
       width: 100%;
     }
   }
-  .pastworkouts {
-    margin-top: 2rem;
-    padding: 2rem;
-    background: #ffffff;
-    border-radius: var(--stanbradius);
-    box-shadow: var(--stanshadow);
-    flex: 1;
-    max-width: none;
-    font-family: sans-serif;
-  }
-  
-  .pastworkouts h3 {
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-    color: #333;
-    border-bottom: 2px solid #4499cc;
-    padding-bottom: 0.5rem;
-  }
-  
-  .pastwork {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .pastitem {
-    padding: 1rem;
-    background-color: #f0f4f8;
-    border-radius: 0.4rem;
-    transition: background-color 0.3s, transform 0.2s;
-  }
-  
-  .pastitem:hover {
-    background-color: #e6f0fa;
-    transform: translateY(-2px);
-  }
-
-.popup-home {
-  z-index:11;
-    position: absolute;
-    margin-right: 10%;
-    display: none;
-    margin-left: 90%;
-    cursor: default;
-    animation: fadeIn 4s 1;
-    width: 100%;
-    height: 10%;
-}
-
-    .popup-home .popuptext {
-        text-align: center;
-        width: 20%;
-        background-color: #4499cc;
-        color: #fff;
-        text-align: center;
-        border-radius: 10px;
-        padding: 20px 0;
-        position: absolute;
-        bottom: 100%;
-    }
-
-@keyframes fadeIn {
-    0%, 100% {
-        opacity: 0;
-    }
-
-    50% {
-        opacity: 1;
-    }
-
-    75% {
-        opacity: 0.9;
-    }
-}
-
-
-.home-sections {
-  display: flex;
-  gap: var(--gap);
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 100%;
-  max-width: 80rem;
-  margin: 0 auto;
-}
-
-.recs {
-  flex: 1;
-  margin-left: var(--gap);
-  padding: 2rem;
-  background: #fff;
-  border-radius: var(--stanbradius);
-  box-shadow: var(--stanshadow);
-}
-
-.recs h3 {
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  color: #333;
-  border-bottom: 2px solid #4499cc;
-  padding-bottom: 0.5rem;
-}
-
-.div-button {
-  display: inline-block;
-  margin-bottom: var(--gap);
-  padding: 0.5rem 1rem;
-  background: var(--buttonback);
-  color: white;
-  border-radius: var(--stanbradius);
-  box-shadow: var(--buttonshadow);
-  cursor: pointer;
-  font-weight: bold;
-}
-.div-button:hover {
-  background: #3377aa;
-  transform: translateY(-1px);
-}
-
-.big-buttons {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: var(--gap);
-}

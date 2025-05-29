@@ -5,19 +5,13 @@ import '../../App.css';
 import { AuthContext } from "../auth/auth.js";
 import delay from 'delay';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-
-
-
 import AOS from 'aos'
 import 'aos/dist/aos.css';
 
-
 const Home = () => {
   const { user } = useContext(AuthContext);
-
   const today = new Date().toISOString().split('T')[0];   
   const now = new Date();
-
   const currentTime = now.toTimeString().slice(0,5);      
 
   const [activity, setActivity] = useState('');
@@ -28,107 +22,103 @@ const Home = () => {
   const [error, setError] = useState('');
   const [icon, setIcon] = useState('/images/icons/workout.svg');
   const [pastWorkouts, setPastWorkouts] = useState([]);
-    const [promptResponses, setpromptResponses] = useState([]);
-    const [weight, setWeight] = useState(155) //accoridng to google
-    const [height, setHeight] = useState(68);  // according to google
-    const [age, setAge] = useState(20);
-    const [gender, setGender] = useState("prefer not to say");
-    const [loadingRec, setLoadingRec] = useState(false);
+  const [promptResponses, setpromptResponses] = useState([]);
+  const [weight, setWeight] = useState(155);
+  const [height, setHeight] = useState(68);
+  const [age, setAge] = useState(20);
+  const [gender, setGender] = useState("prefer not to say");
+  const [loadingRec, setLoadingRec] = useState(false);
 
-    useEffect(() => {
-        AOS.init({ duration: 2000 });
-    }, []);
+  useEffect(() => {
+    AOS.init({ duration: 2000 });
+  }, []);
 
-    const genAI = new GoogleGenerativeAI(
-        "AIzaSyCjKRjNSU9UwkgtpIb0reNGjbmotkh7Xs8"
-    );
+  const genAI = new GoogleGenerativeAI("AIzaSyCjKRjNSU9UwkgtpIb0reNGjbmotkh7Xs8");
 
-
-    const calcCalories = async (timespent, activity, post) => {
-        try {
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-            const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} gender: ${gender} activity: ${activity} time spent: ${timespent} minutes notes(if any): ${post}\n` + "an integer estimate of how much kcal the user burned based on the information given above, return only a number and nothing else";
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            return parseInt(response.text());
-        } catch (error) {
-            alert("generate calorie error");
-        }
+  const calcCalories = async (timespent, activity, post) => {
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} gender: ${gender} activity: ${activity} time spent: ${timespent} minutes notes(if any): ${post}\n` + "an integer estimate of how much kcal the user burned based on the information given above, return only a number and nothing else";
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      return parseInt(response.text());
+    } catch (error) {
+      alert("generate calorie error");
     }
+  }
 
-    const getResponseForGivenPrompt = async () => {
-        try {
-            setLoadingRec(true);
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-            const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} gender: ${gender} \n` + `Please give me three different workout recommendations based on my recent workouts (JSON below). ` +
-              `Return ONLY a JSON array of objects with keys "activity" (string) and "duration" (number).\n` + JSON.stringify(pastWorkouts);
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const text = response.text();
-            console.log(text)
-            let newtext = text.trim();
+  const getResponseForGivenPrompt = async () => {
+    try {
+      setLoadingRec(true);
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} gender: ${gender} \n` + `Please give me three different workout recommendations based on my recent workouts (JSON below). ` +
+        `Return ONLY a JSON array of objects with keys "activity" (string) and "duration" (number).\n` + JSON.stringify(pastWorkouts);
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      console.log(text)
+      let newtext = text.trim();
 
-            if (newtext.startsWith("```")) {
-              newtext = newtext.replace(/^```(?:json)?\r?\n/, "").replace(/\r?\n```$/, "").trim()
-            }
-            
-            const start = newtext.indexOf('[');
-            const end   = newtext.lastIndexOf(']');
-            let finaltext;
-            if (start !== -1 && end !== -1 && end > start) {
-              finaltext = newtext.slice(start, end + 1);
-            } else {
-              finaltext = newtext;
-            }
-
-            let recs;
-            try {
-              recs = JSON.parse(newtext);
-            } catch (err) {
-              console.error("Could not parse AI response:", err);
-              recs = [{ activity: newtext, duration: 0 }];
-            }
-            setpromptResponses(recs);
-            setLoadingRec(false);
-        }
-        catch (error) {
-            
-            console.log(error)
-            console.log("Something Went Wrong");
-        }
-    }
-
-    const diversifyRecommendations = async () => {
-      if (promptResponses.length === 0) return;
-        try {
-            setLoadingRec(true);
-            setpromptResponses([]);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-            const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} gender: ${gender}  \n` +
-          `Please diversify these workout recommendations by changing their categories (e.g. swap a run for a swim, yoga for a hike, etc). ` +
-              `Return ONLY a JSON array of objects with keys "activity" and "duration".\n` + JSON.stringify(promptResponses);
-          const result = await model.generateContent(prompt);
-          const text = await result.response.text();
-        let  newtext   = text.trim();
-        if (newtext.startsWith("```")) {
-          newtext = newtext.replace(/^```(?:json)?\r?\n/, "").replace(/\r?\n```$/, "").trim();
-        }
-
-        let recs;
-        try {
-          recs = JSON.parse(newtext);
-        } catch {
-          recs = [{ activity: newtext, duration: 0 }];
-        }
-            setpromptResponses(recs);
-            setLoadingRec(false);
-      } catch (error) {
-        alert("error")
-        console.log(error)
-        console.log("Something Went Wrong");
+      if (newtext.startsWith("```")) {
+        newtext = newtext.replace(/^```(?:json)?\r?\n/, "").replace(/\r?\n```$/, "").trim()
       }
-    };
+      
+      const start = newtext.indexOf('[');
+      const end   = newtext.lastIndexOf(']');
+      let finaltext;
+      if (start !== -1 && end !== -1 && end > start) {
+        finaltext = newtext.slice(start, end + 1);
+      } else {
+        finaltext = newtext;
+      }
 
+      let recs;
+      try {
+        recs = JSON.parse(newtext);
+      } catch (err) {
+        console.error("Could not parse AI response:", err);
+        recs = [{ activity: newtext, duration: 0 }];
+      }
+      setpromptResponses(recs);
+      setLoadingRec(false);
+    }
+    catch (error) {
+      
+      console.log(error)
+      console.log("Something Went Wrong");
+    }
+  }
+
+  const diversifyRecommendations = async () => {
+    if (promptResponses.length === 0) return;
+    try {
+      setLoadingRec(true);
+      setpromptResponses([]);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} gender: ${gender}  \n` +
+    `Please diversify these workout recommendations by changing their categories (e.g. swap a run for a swim, yoga for a hike, etc). ` +
+        `Return ONLY a JSON array of objects with keys "activity" and "duration".\n` + JSON.stringify(promptResponses);
+    const result = await model.generateContent(prompt);
+    const text = await result.response.text();
+  let  newtext   = text.trim();
+  if (newtext.startsWith("```")) {
+    newtext = newtext.replace(/^```(?:json)?\r?\n/, "").replace(/\r?\n```$/, "").trim();
+  }
+
+  let recs;
+  try {
+    recs = JSON.parse(newtext);
+  } catch {
+    recs = [{ activity: newtext, duration: 0 }];
+  }
+      setpromptResponses(recs);
+      setLoadingRec(false);
+    } catch (error) {
+      alert("error")
+      console.log(error)
+      console.log("Something Went Wrong");
+    }
+  };
 
   useEffect(() => {
     if (!user) {
@@ -167,7 +157,6 @@ const Home = () => {
 
   }, [user]);
 
-
   function changeIcon(text) {
     const lower = text.toLowerCase();
     if (lower.includes("run") || lower.includes('ran') || lower.includes('sprint')) {
@@ -199,11 +188,8 @@ const Home = () => {
 
     const autoUpdateStart = (e) => {
         let updated = new Date();
-        //updated.setHours(start.split(":")[0]);
-        //updated.setMinutes(start.split(":")[1]);
         updated = new Date(updated - 60000 * e);
         setStart(updated.toTimeString().slice(0, 5))
-        
     }
 
   const handleSubmit = async (e) => {
@@ -267,45 +253,56 @@ const Home = () => {
   };
 
   if (!user) {
-    return <p>Please log in to add workouts.</p>;
+    return (
+      <div className="page">
+        <div className="welcome-section">
+          <h2>Please log in to add workouts.</h2>
+        </div>
+      </div>
+    );
   }
 
   return (
-      <div className="page">
-          <div class="popup-home" id="popup"><span class="popuptext">Workout Logged!</span></div>
-      <h2>Welcome back, {user}!</h2>
-      <img src={icon} alt="icon" className="home-icon" />
+    <div className="page">
+      <div className="popup-home" id="popup">
+        <span className="popuptext">Workout Logged!</span>
+      </div>
+      
+      <div className="welcome-section">
+        <img src={icon} alt="workout type" className="home-icon" />
+        <h2>Welcome back, {user}!</h2>
+      </div>
 
       <section className="workout">
         <h3>Add a Workout</h3>
         <form onSubmit={handleSubmit} className="form">
           <div>
-            <label>Activity:</label>
+            <label>Activity</label>
             <input
               type="text"
               value={activity}
               onChange={e => { setActivity(e.target.value); changeIcon(e.target.value); }}
-              placeholder="Exercise"
+              placeholder="What did you do?"
               required
             />
           </div>
 
-                  <div>
-                      <label>Duration:</label>
-                      <input
-                          type="number"
-                          name="duration"
-                          min={1}
-                          max={1440}
-                          value={duration}
-                          onChange={e => { setDuration(e.target.value); autoUpdateStart(e.target.value); setError(''); }}
-                          placeholder="Duration (in minutes)"
-                          required
-                      />
-                  </div>
+          <div>
+            <label>Duration</label>
+            <input
+              type="number"
+              name="duration"
+              min={1}
+              max={1440}
+              value={duration}
+              onChange={e => { setDuration(e.target.value); autoUpdateStart(e.target.value); setError(''); }}
+              placeholder="Minutes"
+              required
+            />
+          </div>
 
           <div>
-            <label>Date:</label>
+            <label>Date</label>
             <input
               type="date"
               value={day}
@@ -316,7 +313,7 @@ const Home = () => {
           </div>
 
           <div>
-            <label>Start Time:</label>
+            <label>Start Time</label>
             <input
               type="time"
               value={start}
@@ -325,87 +322,76 @@ const Home = () => {
             />
           </div>
 
-          
-
-          <div>
-            <label>Notes:</label>
-            <input
-              type="text"
+          <div className="notes-field">
+            <label>Notes</label>
+            <textarea
               value={post}
               onChange={e => setPost(e.target.value)}
-              placeholder="Comments"
+              placeholder="How was your workout?"
+              rows="4"
             />
           </div>
 
           {error && <p className="errors">{error}</p>}
-
-          <button type="submit">Submit Workout</button>
+          <button type="submit">Log Workout</button>
         </form>
       </section>
-    <div className="home-sections">
-      <section className="pastworkouts">
-        <h3>Past Workouts</h3>
-        {pastWorkouts.length === 0
-          ? <p>No recent workouts</p>
-          : (
+
+      <div className="home-sections">
+        <section className="pastworkouts">
+          <h3>Past Workouts</h3>
+          {pastWorkouts.length === 0 ? (
+            <p>No recent workouts</p>
+          ) : (
             <div className="pastwork">
               {pastWorkouts.map(log => (
-                  <div key={log.log_id} className="pastitem" data-aos="fade-right" data-aos-once="true" >
-                      <strong>{log.activity}</strong> on {log.day.slice(0, 10)} at {log.start.slice(0,5)} for {log.duration} min; {log.calories } kcals burned
+                <div key={log.log_id} className="pastitem" data-aos="fade-right" data-aos-once="true">
+                  <strong>{log.activity}</strong>
+                  <div>{log.day.slice(0, 10)} at {log.start.slice(0,5)}</div>
+                  <div>{log.duration} min • {log.calories} kcals burned</div>
                 </div>
               ))}
             </div>
-          )
-        }
-      </section>
+          )}
+        </section>
 
-      <section className="pastworkouts recs">
-        <h3>Recommended Workouts</h3>
-        <div className="big-buttons">
-      <button
-          className="div-button"
-          onClick={getResponseForGivenPrompt}
-        >
-          Generate New Recs
-                      </button>
-        {promptResponses.length === 0 ? (
-            <></>
-        ) : (
-                <button
-                    className="div-button"
-                    onClick={diversifyRecommendations}
-                >
-                    Diversify
-                </button>
-        )}
-        
-      </div>
-        {promptResponses.length === 0
-                      ? <>
-                          {
-                          
-                          loadingRec ? (
-                          <p>Loading...</p>
-              ) : (
-                          <p>No recommendations yet</p>
-                      )
-                      
-                      }
-                      </>
-          : (
+        <section className="pastworkouts">
+          <h3>Recommended Workouts</h3>
+          <div className="big-buttons">
+            <button className="div-button" onClick={getResponseForGivenPrompt}>
+              Generate New Recs
+            </button>
+            {promptResponses.length > 0 && (
+              <button className="div-button" onClick={diversifyRecommendations}>
+                Diversify
+              </button>
+            )}
+          </div>
+          
+          {promptResponses.length === 0 ? (
+            loadingRec ? (
+              <p>Loading...</p>
+            ) : (
+              <p>No recommendations yet</p>
+            )
+          ) : (
             <div className="pastwork">
               {promptResponses.map((rec, i) => (
-                  <div key={i} className="pastitem" data-aos="fade-left" data-aos-once="true" data-aos-delay={i*100 }>
-                  <strong>{rec.activity}</strong> for {rec.duration} min
-                  <br/>
+                <div 
+                  key={i} 
+                  className="pastitem" 
+                  data-aos="fade-left" 
+                  data-aos-once="true" 
+                  data-aos-delay={i*100}
+                >
+                  <strong>{rec.activity}</strong>
+                  <div>{rec.duration} minutes</div>
                 </div>
               ))}
             </div>
-          )
-        }
-      </section>
-    </div>
-
+          )}
+        </section>
+      </div>
     </div>
   );
 };
