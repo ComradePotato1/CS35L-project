@@ -208,19 +208,11 @@ app.post('/log', async (req, res) => {
 app.post('/get-log', async (req, res) => {
     try {
         const { username, range_start, range_end } = req.body;
-        let row
-        if (username === "admin") {
-            [rows] = await pool.execute(
-                'SELECT * FROM log WHERE username=? ORDER BY timestamp DESC',
-                [username]
-            );
-        } else {
-            const placeholders = username.map(() => '?').join(',');
-            [rows] = await pool.execute(
-                'SELECT * FROM log WHERE username in (' + placeholders + ') ORDER BY timestamp DESC',
-                [...username]
-            );
-        }
+        const placeholders = username.map(() => '?').join(',');
+        const [rows] = await pool.execute(
+            'SELECT * FROM log WHERE username in (' + placeholders + ') ORDER BY timestamp DESC',
+            [...username]
+        );
         if (rows.length === 0) {
             return res.status(401).json({ error: 'Username not found' });
         }

@@ -6,7 +6,7 @@ import "./history.css"
 import { AuthContext } from "../auth/auth";
 import '../../App.css';
 import { Pie, Sector, PieChart } from 'recharts';
-import {ComposedChart, Area, Bar,    XAxis,    YAxis,    CartesianGrid,    Tooltip,    Legend,    Scatter,    ResponsiveContainer,} from 'recharts';
+import {ComposedChart, Area, Bar,    XAxis,    YAxis,    CartesianGrid,    Tooltip,    Legend,    ResponsiveContainer,} from 'recharts';
 
 import AOS from 'aos'
 import 'aos/dist/aos.css';
@@ -116,6 +116,10 @@ const handleUnreact = async (logId) => {
             await axios.post('http://localhost:5001/delete-log', {
                 log_id: logId
             });
+
+            await axios.post('http://localhost:5001/refresh-stats-for', {
+                username: user
+            });
             
             fetchLogs();
         } catch (err) {
@@ -181,7 +185,7 @@ const getStats = async () => {
             });
             
             const formattedData = response.data.combined.map((item, index) => ({
-                activity: `${item.activity} ${index}`,
+                activity: `${item.activity} ${index + 1}`,
                 calories: item.calories,
                 duration: item.duration
             }));
@@ -298,7 +302,7 @@ const getStats = async () => {
                       }}
                   >
                       <CartesianGrid stroke="#f5f5f5" />
-                      <XAxis dataKey="activity" scale="band" />
+                      <XAxis dataKey="activity" />
                           <YAxis yAxisId="left" />
                           <YAxis yAxisId="right" orientation="right" />
                       <Tooltip />
@@ -322,7 +326,7 @@ const getStats = async () => {
                 <div className="log-list" >
               
                   {logs.slice(0, ITEMS_PER_PAGE).map((log, index) => (
-                      <div className="log" id={log.log_id} data-aos="fade-up" data-aos-once="true" data-aos-delay={index * 50}>
+                      <div className="log" id={log.log_id} data-aos={`${index > 3 ? "none" : "fade-up"}`} data-aos-once="true" data-aos-delay={500 - index * 50}>
                   <LogItem
                     key={log.log_id}
                     log={log}

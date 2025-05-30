@@ -137,13 +137,13 @@ const Home = () => {
       const getInfo = async () => {
           try {
               const info = await axios.post("http://localhost:5001/get-userinfo", { username: user });
-              if (info.data.rows[0].weight !== "null") {
+              if (info.data.rows[0].weight !== null) {
                   setWeight(info.data.rows[0].weight)
               }
-              if (info.data.rows[0].age !== "null") {
+              if (info.data.rows[0].age !== null) {
                   setAge(info.data.rows[0].age)
               }
-              if (info.data.rows[0].height!== "null") {
+              if (info.data.rows[0].height!== null) {
                   setHeight(info.data.rows[0].height)
               }
               setGender(info.data.rows[0].gender)

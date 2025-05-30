@@ -201,7 +201,7 @@ const LogItem = ({
                         {showHeader ? (
                             <>
                                 <a href={"/user/" + log.username}>
-                                <div className="log-author">
+                                    <div className="welcome-section" style={{height:"8%"} }>
                                     
                                     <img src={"/images/profile/" + profile + ".png"} alt="Profile" style={{ width: "50px", borderRadius: '50%' }} className="log-profile" />
                                     <div style={{alignContent: "center", textAlign: "left"} }>

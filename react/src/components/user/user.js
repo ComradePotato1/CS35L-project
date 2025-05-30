@@ -5,8 +5,8 @@ import '../../App.css';
 import './user.css';
 import { AuthContext } from "../auth/auth.js"
 import LogItem from '../LogItem/LogItem.jsx';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from 'recharts';
-
 
 const User = () => {
     const { user } = useContext(AuthContext);
@@ -16,13 +16,42 @@ const User = () => {
     const [editingLogId, setEditingLogId] = useState(null);
     const [isFollowing, setIsFollowing] = useState(false);
     const [data, setData] = useState([]);
+    const [style, setStyle] = useState("Loading...");
+
+    const genAI = new GoogleGenerativeAI("AIzaSyCjKRjNSU9UwkgtpIb0reNGjbmotkh7Xs8");
+
+    const [info, setInfo] = useState({
+        username: '',
+        name: '',
+        profile: '',
+        weight: '',
+        height: '',
+        age: '',
+        gender: '',
+        social: true,
+    });
+
+
+    useEffect(() => {
+        if (!user) return;
+
+        async function fetchProfile() {
+            try {
+                const res = await axios.post('http://localhost:5001/get-userinfo', { username: queryUser });
+                setInfo(res.data.rows[0]);
+            } catch (err) {
+                console.error('Cannot load profile:', err.response?.data || err);
+            }
+
+        }
+        fetchProfile();
+
+
+    }, [user]);
 
     const fetchLogs = async () => {
         try {
-            let numLogs = 3;
-            if (isFollowing) {
-                numLogs = 15;
-            }
+            let numLogs = 10;
             const response = await axios.post('http://localhost:5001/get-log', {
                 username: [queryUser],
                 range_start: 0,
@@ -128,9 +157,29 @@ const User = () => {
         getStats();
         if (queryUser) {
             fetchLogs();
-        }
-    }, [queryUser, isFollowing]);
 
+            
+        }
+    }, [queryUser]);
+
+    useEffect(() => {
+        const summarizeStyle = async () => {
+            if (style === "Loading...") {
+                try {
+                    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+                    const prompt = `given the user's recent workouts listed below , give a short description of the user's workout style. Do not include bold markings. Return only your analysis and nothing else before and after. Do not include text like 'based on the logs you provided' or include the json data \n ` + JSON.stringify(logs);
+                    const result = await model.generateContent(prompt);
+                    const response = await result.response;
+                    setStyle(response.text());
+                } catch (error) {
+                    alert("error");
+                }
+            }
+        }
+        if (logs.length > 0) {
+            summarizeStyle();
+        }
+    }, [logs]);
 
     const getStats = async () => {
         try {
@@ -148,38 +197,38 @@ const User = () => {
             setData([
                 {
                     activity: "Aerobic",
-                    A: (queryUserStat.aerobic / queryUserSum * 100),
-                    B: (currUserStat.aerobic / currUserSum * 100),
+                    A: parseInt(queryUserStat.aerobic / queryUserSum * 100),
+                    B: parseInt(currUserStat.aerobic / currUserSum * 100),
                     fullMark: 100,
                 },
                 {
                     activity: "Stretching",
-                    A: (queryUserStat.stretching / queryUserSum * 100),
-                    B: (currUserStat.stretching / currUserSum * 100),
+                    A: parseInt(queryUserStat.stretching / queryUserSum * 100),
+                    B: parseInt(currUserStat.stretching / currUserSum * 100),
                     fullMark: 100,
                 },
                 {
-                    activity: "Strengthening",
-                    A: (queryUserStat.strengthening / queryUserSum * 100),
-                    B: (currUserStat.strengthening / currUserSum * 100),
+                    activity: "Strengthen",
+                    A: parseInt(queryUserStat.strengthening / queryUserSum * 100),
+                    B: parseInt(currUserStat.strengthening / currUserSum * 100),
                     fullMark: 100,
                 },
                 {
                     activity: "Balance",
-                    A: (queryUserStat.balance / queryUserSum * 100),
-                    B: (currUserStat.balance / currUserSum * 100),
+                    A: parseInt(queryUserStat.balance / queryUserSum * 100),
+                    B: parseInt(currUserStat.balance / currUserSum * 100),
                     fullMark: 100,
                 },
                 {
                     activity: "Rest",
-                    A: (queryUserStat.rest / queryUserSum * 100),
-                    B: (currUserStat.rest / currUserSum * 100),
+                    A: parseInt(queryUserStat.rest / queryUserSum * 100),
+                    B: parseInt(currUserStat.rest / currUserSum * 100),
                     fullMark: 100,
                 },
                 {
                     activity: "Other",
-                    A: (queryUserStat.other / queryUserSum * 100),
-                    B: (currUserStat.other / currUserSum * 100),
+                    A: parseInt(queryUserStat.other / queryUserSum * 100),
+                    B: parseInt(currUserStat.other / currUserSum * 100),
                     fullMark: 100,
                 },
             ]);
@@ -192,50 +241,72 @@ const User = () => {
         <div className="user-container">
             {userExists ? (
                 <>
-                <p>user page for {queryUser}</p>
-                    <button
-                        onClick={handleFollow}
-                    >
-                        {isFollowing ? 'Following' : 'Follow'}
-                    </button>
+                    <div className="user-info-section">
+                        <div className="welcome-section" style={{ flexWrap: "wrap", position: "sticky", top: "110px" }}>
+                            <img
+                                src={"/images/profile/" + info.profile + ".png"}
+                                alt="Profile"
+                                className="user-profile-pic"
+                                style={{ borderRadius: '50%' }}
+                            />
+                            
+                        <div className="user-name">
+                                <h2>{queryUser}</h2>
+                                <p style={{ color: "#757575", margin: "3px"} }>{info.name}</p>
+                                <button
+                                    onClick={handleFollow} style={{ width: "inherit", padding: "1rem 0rem" }} className={`follow-btn ${isFollowing ? 'followed' : ''}` } >
+                                    {isFollowing ? 'Following' : 'Follow'}
+                                    
+                                </button>
+                            </div>
+                        </div>
+                        <div style={{ flexWrap: "wrap", position: "sticky", top: "560px" }}>
+                        <h2>Workout style</h2>
+                            <p>{style}</p>
+                        </div>
+                    </div>
+                    <div className="user-log-section">
+                        {logs.length === 0 ? (
+                            <p>No workouts recorded yet</p>
+                        ) : (
+                                <>
+
+                                    <RadarChart cx={300} cy={250} outerRadius={150} width={625} height={500} data={data}>
+                                        <PolarGrid stroke="#111" />
+                                        <PolarAngleAxis dataKey="activity"  />
+                                        <PolarRadiusAxis type="number" domain={[-10,]} round="true"/>
+
+                                        <Radar name={queryUser} dataKey="A" stroke="green" fill="green" fillOpacity={0.4} strokeWidth="3.5" />
+                                        <Radar name="Me" dataKey="B" stroke="#4499cc" fill="#4499cc" fillOpacity={0.4} strokeWidth="3.5" />
+                                        <Legend></Legend>
+                                    </RadarChart>
+                                <div className="log-list">
+                                    {logs.map((log) => (
+                                        <LogItem
+                                            key={log.log_id}
+                                            log={log}
+                                            isEditing={editingLogId === log.log_id}
+                                            onEdit={() => setEditingLogId(log.log_id)}
+                                            onSave={handleSaveLog}
+                                            onCancel={() => setEditingLogId(null)}
+                                            onDelete={() => handleDelete(log.log_id)}
+                                            onReact={handleReact}
+                                            onUnreact={handleUnreact}
+                                            currentUser={user}
+                                        />
+                                    ))}
+                                </div>
+                                <p>Showing at most {Math.min(logs.length, 15)} entries</p>
+
+                            </>
+                        )}
+                    </div>
                 </>
             ) : (<>
                 <p>user does not exist</p>
             </>)}
             
-            {logs.length === 0 ? (
-                <p>No workouts recorded yet</p>
-            ) : (
-                <>
-                        <RadarChart cx={300} cy={250} outerRadius={150} width={700} height={500} data={data}>
-                            <PolarGrid stroke="#111" />
-                            <PolarAngleAxis dataKey="activity" />
-                            <PolarRadiusAxis type="number" domain={[-10, 100]} />
-                            
-                            <Radar name={queryUser} dataKey="A" stroke="#4499cc" fill="#4499cc" fillOpacity={0.7} strokeWidth="3.5" />
-                            <Radar name="Me" dataKey="B" stroke="#aaa" fill="#aaa" fillOpacity={0.4} strokeWidth="3.5"/>
-                            <Legend></Legend>
-                        </RadarChart>
-                    <div className="log-list">
-                        {logs.map((log) => (
-                            <LogItem
-                                key={log.log_id}
-                                log={log}
-                                isEditing={editingLogId === log.log_id}
-                                onEdit={() => setEditingLogId(log.log_id)}
-                                onSave={handleSaveLog}
-                                onCancel={() => setEditingLogId(null)}
-                                onDelete={() => handleDelete(log.log_id) }
-                                onReact={handleReact}
-                                onUnreact={handleUnreact}
-                                currentUser={user}
-                            />
-                        ))}
-                    </div>
-                        <p>Showing at most { Math.min(logs.length, 15) } entries</p>
-                   
-                </>
-            )}
+            
         </div>
     );
 };

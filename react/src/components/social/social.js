@@ -70,6 +70,10 @@ const Social = () => {
             await axios.post('http://localhost:5001/delete-log', {
                 log_id: logId
             });
+            await axios.post('http://localhost:5001/refresh-stats-for', {
+                username: user
+            });
+
 
             fetchFollowLogs();
         } catch (err) {

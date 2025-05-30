@@ -226,9 +226,6 @@
 
 .popup {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -242,13 +239,15 @@
   max-width: 300px;
   font-size: 0.95rem;
   text-align: center;
+  
 }
 
 .popup .popuptext {
   margin: 0;
-  padding: 0;
+  padding: 20;
   display: inline-block;
   width: 100%;
+  min-height: 27px;
 }
 
 @keyframes slideIn {
@@ -302,4 +301,38 @@
   .savebutton {
     width: 100%;
   }
+}
+
+@keyframes swipe-left {
+    0% {
+        transform: translateX(0);
+        opacity: 100%;
+    }
+
+    100% {
+        transform: translateX(-100px);
+        opacity: 0%
+    }
+}
+
+@keyframes swipe-right {
+    0% {
+        transform: translateX(0);
+        opacity: 100%;
+    }
+
+    100% {
+        transform: translateX(100px);
+        opacity: 0%
+    }
+}
+
+@keyframes toggleFollow {
+    0% {
+        border-bottom: solid 0.5em white;
+    }
+
+    100% {
+        border-bottom: solid 0.5em #66aaee;
+    }
 }

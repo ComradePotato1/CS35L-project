@@ -167,7 +167,8 @@ const Profile = () => {
         <span className="popuptext">Success!</span>
       </div>
       
-      <div className="page">
+          <div className="page">
+              <a href={"/user/"+user}> 
         <div className="welcome-section">
           <img 
             src={"/images/profile/" + info.profile + ".png"} 
@@ -176,7 +177,8 @@ const Profile = () => {
             style={{ borderRadius: '50%' }}
           />
           <h2>Your Profile</h2>
-        </div>
+                  </div>
+              </a>
 
         <div className="profile-section">
           {editing && (
