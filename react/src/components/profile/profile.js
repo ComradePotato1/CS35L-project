@@ -321,14 +321,16 @@ const Profile = () => {
                 ) : (
                   <ul id="follow">
                     {followersList.map(f => (
+                    <Link to={`/user/${f}`}>
                       <li key={f}>
-                        <Link to={`/user/${f}`}>
+                        
                           {f}
                           {followerInfo[f]?.name && (
                             <i> ({followerInfo[f].name})</i>
                           )}
-                        </Link>
-                      </li>
+                        
+                                                  </li>
+                    </Link>
                     ))}
                   </ul>
                 )
@@ -337,15 +339,17 @@ const Profile = () => {
                   <p id="follow">Not following anyone yet</p>
                 ) : (
                   <ul id="follow">
-                    {followingList.map(f => (
+                                              {followingList.map(f => (
+                                                  <Link to={`/user/${f}`}>
                       <li key={f}>
-                        <Link to={`/user/${f}`}>
+                        
                           {f}
                           {followingInfo[f]?.name && (
                             <i> ({followingInfo[f].name})</i>
                           )}
-                        </Link>
-                      </li>
+                        
+                                                      </li>
+                                                  </Link>
                     ))}
                   </ul>
                 )
