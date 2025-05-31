@@ -192,6 +192,7 @@ const UserSearch = () => {
             <div 
               className="user-info" 
               onClick={() => viewProfile(userResult.username)}
+              style={{ cursor: 'pointer' }} 
             >
               <img 
                 src={userResult.profileImage || '/images/profile/pic-0.png'} 
@@ -209,7 +210,10 @@ const UserSearch = () => {
             </div>
             {userResult.username !== user && (
               <button
-                onClick={() => handleFollow(userResult.username, userResult.isFollowing)}
+                onClick={(e) => {
+                  e.stopPropagation(); 
+                  handleFollow(userResult.username, userResult.isFollowing);
+                }}
                 className={`follow-button ${userResult.isFollowing ? 'following' : ''}`}
                 disabled={refreshing}
               >
