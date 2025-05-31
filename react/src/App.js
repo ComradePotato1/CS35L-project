@@ -12,6 +12,7 @@ import Profile from "./components/profile/profile.js"
 import Cover from "./components/cover/cover.js"
 import Social from "./components/social/social.js"
 import User from "./components/user/user.js"
+import Search from "./components/search/search.js"
 import { Auth } from "./components/auth/auth.js"
 
 import { useEffect, useState } from "react";
@@ -42,6 +43,7 @@ function App() {
               <Route path="/profile" element={<ProtectedRoute> <Profile /> </ProtectedRoute> } />
               <Route path="/social" element={<ProtectedRoute> <Social /> </ProtectedRoute>} />
               <Route path="/user/:queryUser" element={<ProtectedRoute><User /></ProtectedRoute> } />
+              <Route path="/search" element={<ProtectedRoute> <Search /> </ProtectedRoute>} />
           </Routes>
             </div>
         </Auth>

@@ -64,8 +64,10 @@ const Navbar = () => {
                     }
 
                     {user ? (
-                        <button onClick={() => navigate("/user")} className={location.pathname.slice(0,5) === "/user" ? "active-link-container" : "link-container"}>
-                            <a href="/user" className="home">Search </a>
+                        <button onClick={() => navigate("/search")} className={location.pathname === "/search" ? "active-link-container" : "link-container"}>
+                            <Link to="/search" className="home">
+                                <i className="fas fa-search"></i> Search
+                            </Link>
                         </button>
                     ) : (<span />)
                     }

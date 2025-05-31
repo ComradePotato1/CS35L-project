@@ -400,28 +400,55 @@ app.post('/search-user', async (req, res) => {
     }
 });
 
+app.post('/api/search-users', async (req, res) => {
+    try {
+      const { q } = req.query;
+      const [users] = await pool.execute(
+        `SELECT 
+          u.username, 
+          u.name, 
+          u.profile,
+          CASE WHEN f.follower IS NOT NULL THEN TRUE ELSE FALSE END AS isFollowing
+         FROM users u
+         LEFT JOIN follow f ON u.username = f.followee AND f.follower = ?
+         WHERE u.username LIKE ? OR u.name LIKE ?
+         LIMIT 20`,
+        [req.body.searcher, `%${q}%`, `%${q}%`]
+      );
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
 app.post('/follow', async (req, res) => {
     try {
-        const { follower, followee, unfollow } = req.body;
-
-        if (unfollow) {
-            await pool.execute(
-                'delete from follow where follower = ? and followee = ?',
-                [follower, followee]
-            );
-        } else {
-            await pool.execute(
-                'insert into follow (follower, followee) values (?, ?)',
-                [follower, followee]
-            );
-        }
-        
-
-        res.status(200).json({ message: 'Follow successful' });
+      const { follower, followee, unfollow } = req.body;
+      
+      if (follower === followee) {
+        return res.status(400).json({ message: "Cannot follow yourself" });
+      }
+  
+      if (unfollow) {
+        await pool.execute(
+          'DELETE FROM follow WHERE follower = ? AND followee = ?',
+          [follower, followee]
+        );
+      } else {
+        await pool.execute(
+          'INSERT INTO follow (follower, followee) VALUES (?, ?)',
+          [follower, followee]
+        );
+      }
+      
+      res.status(200).json({ 
+        message: unfollow ? 'Unfollowed successfully' : 'Followed successfully',
+        isFollowing: !unfollow
+      });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      res.status(500).json({ message: error.message });
     }
-});
+  });
 
 //note - follower is the one requesting to follow and followee is the one being followed
 app.post('/get-follower', async (req, res) => {
