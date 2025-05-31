@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../auth/auth';
 import { useNavigate } from 'react-router-dom';
@@ -10,34 +10,57 @@ const UserSearch = () => {
   const [results, setResults] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
 
-  useEffect(() => {
-    const fetchRecommendations = async () => {
-      if (!user) return;
+  const fetchRecommendations = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      setRefreshing(true);
+      const response = await axios.post('http://localhost:5001/get-user-rec', {
+        username: user
+      });
       
-      try {
-        setLoading(true);
-        const response = await axios.post('http://localhost:5001/get-user-rec', {
-          username: user
-        });
-        const userDetails = await Promise.all(
-          response.data.result.map(username => 
-            axios.post('http://localhost:5001/get-userinfo', { username })
-          )
-        );
-        setRecommendations(userDetails.map(res => res.data.rows[0]));
-      } catch (err) {
-        setError(err.response?.data?.error || 'Error fetching recommendations');
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchRecommendations();
+      const userDetails = await Promise.all(
+        response.data.result.map(username => 
+          axios.post('http://localhost:5001/get-userinfo', { username })
+        )
+      );
+
+      const usersWithFollowStatus = await Promise.all(
+        userDetails.map(async (res) => {
+          const userData = res.data.rows[0];
+          try {
+            const followCheck = await axios.post('http://localhost:5001/api/search-users', {
+              q: userData.username,
+              searcher: user
+            });
+            return {
+              ...userData,
+              isFollowing: followCheck.data.some(u => u.username === userData.username && u.isFollowing)
+            };
+          } catch {
+            return userData;
+          }
+        })
+      );
+      
+      setRecommendations(usersWithFollowStatus);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Error fetching recommendations');
+    } finally {
+      setRefreshing(false);
+    }
   }, [user]);
+
+
+  useEffect(() => {
+    fetchRecommendations();
+  }, [fetchRecommendations]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -51,7 +74,26 @@ const UserSearch = () => {
       const response = await axios.post('http://localhost:5001/search-user', {
         username: searchTerm
       });
-      setResults(response.data.result);
+      
+
+      const resultsWithFollowStatus = await Promise.all(
+        response.data.result.map(async (user) => {
+          try {
+            const followCheck = await axios.post('http://localhost:5001/api/search-users', {
+              q: user.username,
+              searcher: user
+            });
+            return {
+              ...user,
+              isFollowing: followCheck.data.some(u => u.username === user.username && u.isFollowing)
+            };
+          } catch {
+            return user;
+          }
+        })
+      );
+      
+      setResults(resultsWithFollowStatus);
     } catch (err) {
       setError(err.response?.data?.error || 'Error searching users');
     } finally {
@@ -61,51 +103,57 @@ const UserSearch = () => {
 
   const handleFollow = async (followeeUsername, isFollowing) => {
     try {
+      // Optimistic UI update
+      setRecommendations(prev => 
+        prev.map(u => 
+          u.username === followeeUsername 
+            ? { ...u, isFollowing: !isFollowing } 
+            : u
+        )
+      );
+      
+      setResults(prev => 
+        prev.map(u => 
+          u.username === followeeUsername 
+            ? { ...u, isFollowing: !isFollowing } 
+            : u
+        )
+      );
+
+
       await axios.post('http://localhost:5001/follow', {
         follower: user,
         followee: followeeUsername,
         unfollow: isFollowing
       });
-      
 
-      setResults(prev => prev.map(u => 
-        u.username === followeeUsername 
-          ? { ...u, isFollowing: !isFollowing } 
-          : u
-      ));
-      setRecommendations(prev => prev.map(u => 
-        u.username === followeeUsername 
-          ? { ...u, isFollowing: !isFollowing } 
-          : u
-      ));
+
+      await fetchRecommendations();
+      
     } catch (err) {
+
+      setRecommendations(prev => 
+        prev.map(u => 
+          u.username === followeeUsername 
+            ? { ...u, isFollowing } 
+            : u
+        )
+      );
+      
+      setResults(prev => 
+        prev.map(u => 
+          u.username === followeeUsername 
+            ? { ...u, isFollowing } 
+            : u
+        )
+      );
+      
       setError(err.response?.data?.error || 'Error updating follow status');
     }
   };
 
   const viewProfile = (username) => {
     navigate(`/profile/${username}`);
-  };
-
-  const getUserWithFollowStatus = async (userList) => {
-    if (!user) return userList;
-    
-    return Promise.all(
-      userList.map(async (u) => {
-        try {
-          const response = await axios.post('http://localhost:5001/api/search-users', {
-            q: u.username,
-            searcher: user
-          });
-          return {
-            ...u,
-            isFollowing: response.data.some(user => user.username === u.username && user.isFollowing)
-          };
-        } catch {
-          return u;
-        }
-      })
-    );
   };
 
   return (
@@ -132,7 +180,6 @@ const UserSearch = () => {
       {error && <div className="error-message">{error}</div>}
 
       <div className="search-results">
-        {/* Show search results if they exist, otherwise show recommendations */}
         {(results.length > 0 ? results : recommendations).map((userResult) => (
           <div key={userResult.username} className="user-card">
             <div 
@@ -153,15 +200,18 @@ const UserSearch = () => {
               <button
                 onClick={() => handleFollow(userResult.username, userResult.isFollowing)}
                 className={`follow-button ${userResult.isFollowing ? 'following' : ''}`}
+                disabled={refreshing}
               >
-                {userResult.isFollowing ? 'Following' : 'Follow'}
+                {refreshing && userResult.isFollowing ? 'Updating...' : 
+                 userResult.isFollowing ? 'Following' : 'Follow'}
               </button>
             )}
           </div>
         ))}
         
-        {/* Show message when there are no results or recommendations */}
-        {results.length === 0 && recommendations.length === 0 && !loading && (
+        {refreshing && <div className="loading-message">Refreshing recommendations...</div>}
+        
+        {!refreshing && results.length === 0 && recommendations.length === 0 && (
           <div className="no-results">
             {searchTerm ? 'No users found' : 'No recommendations available'}
           </div>

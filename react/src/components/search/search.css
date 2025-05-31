@@ -122,6 +122,52 @@
     border-radius: 8px;
     margin-bottom: 1rem;
   }
+
+  .loading-message {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+  }
+  
+  .follow-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .user-avatar {
+    cursor: pointer;
+  }
+  
+  .user-info {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .no-results {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+  }
+  
+  .user-card {
+    transition: all 0.2s ease;
+  }
+  
+  .user-card:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .follow-button {
+    transition: all 0.2s ease;
+  }
+  
+  .follow-button.following {
+    background-color: #e0e0e0;
+    color: #333;
+  }
   
   @media (max-width: 768px) {
     .search-form {
