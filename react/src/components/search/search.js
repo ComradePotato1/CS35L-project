@@ -160,7 +160,7 @@ const UserSearch = () => {
   };
 
   const viewProfile = (username) => {
-    navigate(`/profile/${username}`);
+    navigate(`/user/${username}`);
   };
 
   return (
