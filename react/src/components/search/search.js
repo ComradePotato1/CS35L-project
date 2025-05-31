@@ -14,6 +14,10 @@ const UserSearch = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const getProfileImage = (profileData) => {
+    const profileId = profileData?.profile || '0';
+    return `/images/profile/pic-${profileId}.png`;
+  };
 
   const fetchRecommendations = useCallback(async () => {
     if (!user) return;
@@ -24,7 +28,6 @@ const UserSearch = () => {
         username: user
       });
       
-
       const userDetails = await Promise.all(
         response.data.result.map(username => 
           axios.post('http://localhost:5001/get-userinfo', { username })
@@ -41,10 +44,14 @@ const UserSearch = () => {
             });
             return {
               ...userData,
-              isFollowing: followCheck.data.some(u => u.username === userData.username && u.isFollowing)
+              isFollowing: followCheck.data.some(u => u.username === userData.username && u.isFollowing),
+              profileImage: getProfileImage(userData)
             };
           } catch {
-            return userData;
+            return {
+              ...userData,
+              profileImage: getProfileImage(userData)
+            };
           }
         })
       );
@@ -187,9 +194,13 @@ const UserSearch = () => {
               onClick={() => viewProfile(userResult.username)}
             >
               <img 
-                src={`/images/profiles/${userResult.profile || 'pic-0'}.png`} 
+                src={userResult.profileImage || '/images/profile/pic-0.png'} 
                 alt={userResult.username}
                 className="user-avatar"
+                onError={(e) => {
+                  e.target.onerror = null; 
+                  e.target.src = '/images/profile/pic-0.png';
+                }}
               />
               <div>
                 <h3>{userResult.username}</h3>
