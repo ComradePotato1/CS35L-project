@@ -385,13 +385,13 @@ const Social = () => {
                                 {followerLogs.map((log, index) => (
                                     <div className="log" data-aos="fade-up" data-aos-once="true" data-aos-delay={150 - index * 50}>
                                 <LogItem
-                                    key={log.log_id}
-                                    log={log}
-                                    isEditing={false}
-                                    onReact={handleReact}
-                                    onUnreact={handleUnreact}
-                                    currentUser={user}
-                                    showHeader={true}
+                                            key={log.log_id}
+                                            log={log}
+                                            isEditing={false}
+                                            onReact={handleReact}
+                                            onUnreact={handleUnreact}
+                                            currentUser={user}
+                                            showHeader={true}
                                     />
                                 </div>
                             ))}
@@ -426,7 +426,7 @@ const Social = () => {
                 ) : (
                     <>
                             <div className="social-log-list" data-aos="fade-up" data-aos-once="true" >
-                            {followLogs.map((log) => (
+                                {followLogs.slice(0, ITEMS_PER_PAGE).map((log) => (
                                 <LogItem
                                     key={log.log_id}
                                     log={log}

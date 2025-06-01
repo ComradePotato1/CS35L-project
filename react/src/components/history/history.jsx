@@ -334,7 +334,7 @@ const getStats = async () => {
                 <div className="log-list" >
               
                   {logs.slice(0, ITEMS_PER_PAGE).map((log, index) => (
-                      <div className="log" id={log.log_id} data-aos={`${index > 3 ? "none" : "fade-up"}`} data-aos-once="true" data-aos-delay={500 - index * 50}>
+                      <div className="log" id={log.log_id} data-aos="fade-up" data-aos-once="true" data-aos-delay={400 - index * 50}>
                   <LogItem
                     key={log.log_id}
                     log={log}

@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 
 import Login from "./components/auth/login.js"
@@ -27,7 +26,6 @@ import {
 
 
 function App() {
-    const [user, setUser] = useState(null);
 
     return (
       <Auth>

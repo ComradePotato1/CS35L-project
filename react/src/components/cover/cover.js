@@ -34,7 +34,7 @@ const Cover = () => {
         <div className="cover-page">
         <div className="cover-background">
             <div style={{ height: "8vh" }}></div>
-            <img className="cover-app-icon" src="/images/eggert-2.jpg" alt="app-icon" data-aos="fade-up" data-aos-once="true" />
+            <img className="cover-app-icon" src="/images/logo.png" alt="app-icon" data-aos="fade-up" data-aos-once="true" />
                 <div className="header-text" data-aos="fade-up" data-aos-once="true">FitAI</div>
                 <div style={{ height: "5vh" } }></div>
                 <button onClick={handleRegister} className="cover-register-button" data-aos="fade-up" data-aos-delay="300" data-aos-once="true" >New user? Register</button>

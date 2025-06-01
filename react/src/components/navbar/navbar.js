@@ -33,7 +33,8 @@ const Navbar = () => {
         !hideNavbar && (
             <nav className="nav">
                 <a href="/home" className="sitename">
-                    <img src="" alt="logo" className="logo-image" />
+                    {/*<img src="/images/logo.png" alt="logo" className="logo-image" />*/}
+                    <p>FitAI</p>
                 </a>
                 <div className="links">
                     {user ? (

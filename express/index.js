@@ -29,7 +29,7 @@ const pool = mysql.createPool({
 
 const workoutCategories = {
     rest: ['rest', 'recovery', 'nap', 'sleep', 'relax', 'meditation', 'day off', 'chill', 'rest day'],
-    aerobic: ['run', 'ran', 'sprint', 'jog', 'cycle', 'swim', 'row', 'dance', 'aerobics', 'cardio', 'hiit', 'kickbox', 'zumba', 'elliptical', 'spin', 'cycling', 'jumping rope', 'boxing', 'martial arts', 'hiking'],
+    aerobic: ['run', 'ran', 'sprint', 'jog', 'cycle', 'swim', 'row', 'dance', 'aerobics', 'cardio', 'hiit', 'kickbox', 'zumba', 'elliptical', 'spin', 'cycling', 'jumping rope', 'boxing', 'martial arts', 'hiking','ball', 'soccer', ],
     strengthening: ['strength', 'lift', 'weight', 'resistance', 'crossfit', 'powerlift', 'calisthen', 'plyo', 'muscle', 'bench', 'deadlift', 'squat', 'pull-up', 'push-up', 'dip', 'kettlebell', 'barbell', 'dumbbell', 'bodyweight', 'chin-up', 'press', 'clean', 'snatch'],
     balance: ['yoga', 'tai chi', 'balance', 'stability', 'pilates', 'proprioception', 'vinyasa', 'hatha', 'yin', 'ashtanga', 'iyengar', 'kundalini', 'acro yoga', 'balance board', 'slackline'],
     stretching: ['stretch', 'flexibility', 'limber', 'mobility', 'cool down', 'warm up', 'static', 'dynamic', 'hamstring', 'quad', 'shoulder', 'hip flexor', 'psoas', 'foam roll', 'myofascial', 'lunge', 'twist', 'extension'],
@@ -250,13 +250,21 @@ app.post('/refresh-stats', async (req, res) => {
       const [result] = await pool.execute("SELECT * FROM log");
         for (let i = 0; i < result.length; i++) {
             const lower = result[i].activity.toLowerCase();
+            let other = true;
             for (const [cat, keywords] of Object.entries(workoutCategories)) {
                 if (keywords.some(keyword => lower.includes(keyword))) {
                     await pool.execute(
                         `UPDATE stats SET ${cat} = ${cat} + ? WHERE username = ?`,
                         [result[i].calories, result[i].username]
                     );
+                    other = false;
                 }
+            }
+            if (other) {
+                await pool.execute(
+                    `UPDATE stats SET other = other + ? WHERE username = ?`,
+                    [result[i].calories, result[i].username]
+                );
             }
         }
       res.status(200).json({ message: "refresh success" });
@@ -271,6 +279,7 @@ app.post('/refresh-stats-for', async (req, res) => {
         await pool.execute("DELETE FROM stats WHERE username=?", [username]);
         await pool.execute('INSERT INTO stats (username, aerobic, stretching, strengthening, balance, rest, other) VALUES (?, 0, 0, 0, 0, 0, 0)', [username]);
         const [result] = await pool.execute("SELECT * FROM log WHERE username = ?", [username]);
+        let other = true;
         for (let i = 0; i < result.length; i++) {
             const lower = result[i].activity.toLowerCase();
             for (const [cat, keywords] of Object.entries(workoutCategories)) {
@@ -279,7 +288,14 @@ app.post('/refresh-stats-for', async (req, res) => {
                         `UPDATE stats SET ${cat} = ${cat} + ? WHERE username = ?`,
                         [result[i].calories, result[i].username]
                     );
+                    other = false;
                 }
+            }
+            if (other) {
+                await pool.execute(
+                    `UPDATE stats SET other = other + ? WHERE username = ?`,
+                    [result[i].calories, result[i].username]
+                );
             }
         }
         res.status(200).json({ message: "refresh success" });
@@ -292,13 +308,21 @@ app.post('/add-stats', async(req, res) => {
     try {
         const { username, activity, calories} = req.body;
         const lower = activity.toLowerCase();
+        let other = true;
         for (const [cat, keywords] of Object.entries(workoutCategories)) {
             if (keywords.some(keyword => lower.includes(keyword))) {
                 await pool.execute(
                     `UPDATE stats SET ${cat} = ${cat} + ? WHERE username = ?`,
                     [calories, username]
                 );
+                other = false;
             }
+        }
+        if (other) {
+            await pool.execute(
+                `UPDATE stats SET other = other + ? WHERE username = ?`,
+                [calories, username]
+            );
         }
         res.status(200).json({ message: "add success" });
     } catch (error) {

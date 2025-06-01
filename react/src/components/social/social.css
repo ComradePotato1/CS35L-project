@@ -56,3 +56,21 @@ a {
     transition: all 0.3s ease-out !important;
     transform-origin: center center !important;
 }
+
+.log-header-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.log-header-section h2 {
+    font-weight: 600;
+    font-size: 1.75rem;
+    color: #2d3748;
+    margin: 0;
+}

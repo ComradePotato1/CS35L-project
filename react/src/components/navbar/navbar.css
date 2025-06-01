@@ -28,13 +28,15 @@ nav .title {
 }
 
 .sitename{
-    margin-left: 8px; 
+    margin-left: 30px; 
     font-size: 35px;
     font-weight: bold;
     text-align: center;
     padding: 14px 16px;
     color: white;
     text-decoration: none;
+    display:flex;
+    color: black;
 }
 
 .links{
