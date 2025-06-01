@@ -4,7 +4,11 @@ import './social.css';
 import { AuthContext } from "../auth/auth.js"
 import axios from 'axios';
 import LogItem from '../LogItem/LogItem.jsx';
+import { Pie, Sector, PieChart } from 'recharts';
+import delay from 'delay'
 
+import AOS from 'aos'
+import 'aos/dist/aos.css';
 
 const Social = () => {
     const { user } = useContext(AuthContext);
@@ -16,7 +20,11 @@ const Social = () => {
     const [followerLogs, setFollowerLogs] = useState([]);
     const [page, setPage] = useState(0);
     const [editingLogId, setEditingLogId] = useState(null);
+    const [followAvg, setFollowAvg] = useState([]);
+    const [totalAvg, setTotalAvg] = useState([]);
     const ITEMS_PER_PAGE = 3;
+
+
 
     const getRecs = async () => {
         try {
@@ -116,7 +124,7 @@ const Social = () => {
             const response = await axios.post('http://localhost:5001/get-log', {
                 username: recs,
                 range_start: 0,
-                range_end: 2,
+                range_end: 3,
             });
             log = response.data.combined;
 
@@ -148,7 +156,7 @@ const Social = () => {
             const response = await axios.post('http://localhost:5001/get-log', {
                 username: follower,
                 range_start: page * ITEMS_PER_PAGE,
-                range_end: (page + 1) * ITEMS_PER_PAGE
+                range_end: 2
             });
             setFollowerLogs(response.data.combined || []);
         } catch (err) {
@@ -195,19 +203,187 @@ const Social = () => {
         }
     };
 
+    const getStatsAvg = async (which, data) => {
+        try {
+            let stat = await axios.post('http://localhost:5001/get-stats-avg', {
+                username: which,
+            });
+            stat = stat.data.result;
+            const sum = Number(stat["avg(aerobic)"]) + Number(stat["avg(stretching)"]) + Number(stat["avg(strengthening)"]) + Number(stat["avg(balance)"]) + Number(stat["avg(rest)"]) + Number(stat["avg(other)"])
+            data([]);
+            setTimeout(() => {
+                data([
+                    {
+                        activity: "Aerobic",
+                        A: (stat["avg(aerobic)"] / sum * 100),
+                        fullMark: 100,
+                    },
+                    {
+                        activity: "Stretch",
+                        A: (stat["avg(stretching)"] / sum * 100),
+                        fullMark: 100,
+                    },
+                    {
+                        activity: "Strength",
+                        A: (stat["avg(strengthening)"] / sum * 100),
+                        fullMark: 100,
+                    },
+                    {
+                        activity: "Balance",
+                        A: (stat["avg(balance)"] / sum * 100),
+                        fullMark: 100,
+                    },
+                    {
+                        activity: "Rest",
+                        A: (stat["avg(rest)"] / sum * 100),
+                        fullMark: 100,
+                    },
+                    {
+                        activity: "Other",
+                        A: (stat["avg(other)"] / sum * 100),
+                        fullMark: 100,
+                    },
+                ]);
+            }, 10);
+            
+
+        } catch (err) {
+            data([]);
+            console.error("get failed:", err);
+        }
+    }
+
+    useEffect(() => {
+        const d = async () => {
+            delay(150);
+        }
+        d(); //need this for animation to show up?
+        getStatsAvg(following, setFollowAvg); 
+        getStatsAvg("", setTotalAvg);
+    }, [following]);
+
+
+    const renderActiveShape = (props) => {
+        const RADIAN = Math.PI / 180;
+        const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent } = props;
+
+        const sin = Math.sin(-RADIAN * midAngle);
+        const cos = Math.cos(-RADIAN * midAngle);
+        const sx = cx + (outerRadius + 10) * cos;
+        const sy = cy + (outerRadius + 10) * sin;
+        const mx = cx + (outerRadius + 30) * cos;
+        const my = cy + (outerRadius + 30) * sin;
+        const ex = mx + (cos >= 0 ? 1 : -1) * 22;
+        const ey = my;
+        const textAnchor = cos >= 0 ? 'start' : 'end';
+
+        return (
+            <g>
+                
+                <Sector
+                    cx={cx}
+                    cy={cy}
+                    innerRadius={innerRadius}
+                    outerRadius={outerRadius}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    fill={fill}
+                />
+                <Sector
+                    cx={cx}
+                    cy={cy}
+                    startAngle={startAngle}
+                    endAngle={endAngle}
+                    innerRadius={outerRadius + 6}
+                    outerRadius={outerRadius + 10}
+                    fill={fill}
+                />
+                <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
+                <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
+                <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`${payload.activity}`}</text>
+                <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
+                    {`${(percent * 100).toFixed(2)}%`}
+                </text>
+            </g>
+        );
+    };
+
+    const [activeIndex1, setActiveIndex1] = useState(0);
+    const [activeIndex2, setActiveIndex2] = useState(0);
+
+    const onPieEnter1 = (_, index) => {
+        setActiveIndex1(index);
+    };
+    const onPieEnter2 = (_, index) => {
+        setActiveIndex2(index);
+    };
+    //maybe clean this up
+
+    useEffect(() => {
+        AOS.init({ duration: 1000 });
+    }, []);
 
     return (
-        <div className="social-container">
-            <div>
 
+        <div className="social-container">
+            <div className="social-graphs" style={{ borderRight: "solid 1px #eee", marginRight: "2em" }}>
                 
+
+                <h2 style={{ position: "sticky", top: "10%" }}>Activity Distributions</h2>
+                
+                <PieChart width={530} height={380} style={{ marginLeft: "0", position: "sticky", top: "11%" }} isAnimationActive={true}>
+                        <Pie
+                        activeIndex={activeIndex1}
+                        data={totalAvg}
+                        dataKey="A"
+                        innerRadius={90}
+                        outerRadius={130}
+                        cx="50%"
+                        fill="#4499cc"
+                        onMouseEnter={onPieEnter1}
+                        activeShape={renderActiveShape}
+                        isAnimationActive={true}
+                        animationDuration={2000}
+                        >
+                        </Pie>
+                        <text x={"50%"} y={"50%"} dy={8} textAnchor="middle" fill="#000" style={{ fontSize: "1.5em", fontWeight: "bold" }}>
+                            Global
+                        </text>
+                    </PieChart>
+                
+                
+                {following.length > 0 ? (
+                    <PieChart width={530} height={360} style={{ marginLeft: "0", position: "sticky", top: "50%" }} isAnimationActive={true}>
+                    <Pie
+                        activeIndex={activeIndex2}
+                        data={followAvg}
+                        dataKey="A"
+                        innerRadius={90}
+                        outerRadius={130}
+                        cx="50%"
+                        fill="green"
+                        onMouseEnter={onPieEnter2}
+                        activeShape={renderActiveShape}
+                        isAnimationActive={true}
+                    >
+                    </Pie>
+                    <text x={"50%"} y={"50%"} dy={8}  textAnchor="middle" fill="#000" style={{ fontSize: "1.5em", fontWeight: "bold" }}>
+                        Following
+                    </text>
+                    </PieChart>
+                ) : (<></>)}
+            </div>
+            <div className="social-logs">
+
                 {followerLogs.length === 0 ? (
                     <></>
                 ) : (
-                    <>
-                    <h1>New followers!</h1>
-                        <div className="log-list">
-                            {followerLogs.map((log) => (
+                    <div style = {{ minHeight: "85vh" } }>
+                            <h1 data-aos="fade-down" data-aos-once="true" >New followers!</h1>
+                            <div className="social-log-list">
+                                
+                                {followerLogs.map((log, index) => (
+                                    <div className="log" data-aos="fade-up" data-aos-once="true" data-aos-delay={150 - index * 50}>
                                 <LogItem
                                     key={log.log_id}
                                     log={log}
@@ -216,18 +392,19 @@ const Social = () => {
                                     onUnreact={handleUnreact}
                                     currentUser={user}
                                     showHeader={true}
-                                />
+                                    />
+                                </div>
                             ))}
                         </div>
-                    </>
+                    </div>
                 )}
 
-                <h1>Recommended user logs</h1>
+                <h1 data-aos="fade-up" data-aos-once="true" >Recommended</h1>
                 {recLogs.length === 0 ? (
                     <p>No workouts recorded yet</p>
                 ) : (
                     <>
-                        <div className="log-list">
+                            <div className="social-log-list" data-aos="fade-up" data-aos-once="true" >
                                 {recLogs.map((log) => (
                                 <LogItem
                                         key={log.log_id}
@@ -243,12 +420,12 @@ const Social = () => {
                     </>
                 )}
 
-                <h1>Following user logs</h1>
+                <h1 data-aos="fade-up" data-aos-once="true" >Following</h1>
                 {followLogs.slice(0, ITEMS_PER_PAGE).length === 0 ? (
                     <p>No workouts recorded yet</p>
                 ) : (
                     <>
-                        <div className="log-list">
+                            <div className="social-log-list" data-aos="fade-up" data-aos-once="true" >
                             {followLogs.map((log) => (
                                 <LogItem
                                     key={log.log_id}

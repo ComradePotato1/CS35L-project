@@ -167,7 +167,7 @@ const User = () => {
             if (style === "Loading...") {
                 try {
                     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-                    const prompt = `given the user's recent workouts listed below , give a short description of the user's workout style. Do not include bold markings. Return only your analysis and nothing else before and after. Do not include text like 'based on the logs you provided' or include the json data \n ` + JSON.stringify(logs);
+                    const prompt = `given the user's recent workouts listed below , give a short description of the user's workout style. Do not include bold markings. Return only your analysis and nothing else before and after. Do not include text like 'based on the logs you provided' or include the json data, ignore logs named demo \n ` + JSON.stringify(logs);
                     const result = await model.generateContent(prompt);
                     const response = await result.response;
                     setStyle(response.text());

@@ -321,6 +321,28 @@ app.post('/get-stats', async (req, res) => {
     }
 });
 
+app.post('/get-stats-avg', async (req, res) => {
+    try {
+        const { username } = req.body;
+        let rows;
+        if (username === "") {
+            [rows] = await pool.execute(
+                `select avg(aerobic), avg(stretching), avg(strengthening), avg(balance), avg(rest), avg(other) from stats`
+            );
+        } else {
+            const placeholders = username.map(() => '?').join(',');
+            [rows] = await pool.execute(
+                `select avg(aerobic), avg(stretching), avg(strengthening), avg(balance), avg(rest), avg(other) from stats where username in (` + placeholders + `);`,
+                [...username]
+            );
+        }
+        const result = rows[0]
+        res.status(200).json({ result });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 
 app.post('/react', async (req, res) => {

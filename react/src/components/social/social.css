@@ -1,6 +1,16 @@
 .social-container {
     max-width: 1200px;
     margin: 2rem auto;
+    padding: 0 1rem;
+    display: flex;
+}
+
+.social-graphs {
+    flex-grow: 1;
+}
+
+.social-logs {
+    flex-grow: 1;
 }
 
 .log-author {
@@ -28,4 +38,21 @@
 
 a {
     text-decoration: none;
+}
+
+.log-item {
+    max-height: max-content;
+    margin-bottom: 3%;
+
+}
+
+.social-log-list {
+    display: grid;
+    gap: 0%;
+    width: 100%;
+}
+
+.recharts-layer recharts-pie-sector {
+    transition: all 0.3s ease-out !important;
+    transform-origin: center center !important;
 }

@@ -142,12 +142,12 @@ const getStats = async () => {
         fullMark: 100,
       },
       {
-        activity: "Stretching",
+        activity: "Stretch",
         A: (stat.stretching / sum * 100),
         fullMark: 100,
       },
       {
-        activity: "Strengthen",
+        activity: "Strength",
         A: (stat.strengthening / sum * 100),
         fullMark: 100,
       },
@@ -190,7 +190,7 @@ const getStats = async () => {
                 duration: item.duration
             }));
 
-            setMostRecent(formattedData); 
+            setMostRecent(formattedData.reverse()); 
         } catch (err) {
             alert(err);
             console.error("get failed:", err);
@@ -222,9 +222,7 @@ const getStats = async () => {
 
         return (
             <g>
-                <text x={cx} y={cy} dy={8} textAnchor="middle" fill="#000" style={{fontWeight:"bold"} }>
-                    Activity Distribution
-                </text>
+                
                 <Sector
                     cx={cx}
                     cy={cy}
@@ -267,11 +265,13 @@ const getStats = async () => {
 
   return (
       <div className="history-container">
-          <div classNmae="history-graphs" style={{borderRight:"solid 1px #eee", marginRight: "2em"} }>
+          <div className="history-graphs" style={{borderRight:"solid 1px #eee", marginRight: "2em"} }>
 
               <h2>Workout Statistics</h2>
 
-              <PieChart width={550} height={400} style={{ marginLeft: "0", position: "sticky", top: "90px" }}>
+              {logs.length > 1 ? (
+                  <>
+                  <PieChart width={570} height={400} style={{ marginLeft: "0", position: "sticky", top: "7%" }}>
                   <Pie
                       activeIndex={activeIndex}
                       data={data}
@@ -282,13 +282,15 @@ const getStats = async () => {
                       fill="#4499cc"
                       onMouseEnter={onPieEnter}
                       activeShape={renderActiveShape}
-
+                      
                   >
                   </Pie>
+                  <text x={"50%"} y={"50%"} dy={8} textAnchor="middle" fill="#000" style={{ fontWeight: "bold" }}>
+                      Activity Distribution
+                  </text>
               </PieChart>
 
               <h3 style={{position: "sticky", top: "450px" }}>Summary of most recent {mostRecent.length} workouts</h3>
-              {mostRecent.length > 0 ? (
                   <ResponsiveContainer width="100%" height={300} style={{ marginLeft: "0", position: "sticky", top: "475px" }}>
                   <ComposedChart
                       width={500}
@@ -307,14 +309,20 @@ const getStats = async () => {
                           <YAxis yAxisId="right" orientation="right" />
                       <Tooltip />
                       <Legend />
-                      <Area yAxisId="left" type="monotone" dataKey="calories" fill="#8884d8" stroke="#8884d8" />
-                      <Bar yAxisId="right" name="Duration" dataKey="duration" barSize={20} fill="#413ea0" />
+                      <Area yAxisId="left" type="monotone" dataKey="duration" fill="#8884d8" stroke="#8884d8" />
+                      <Bar yAxisId="right" dataKey="calories" barSize={20} fill="#413ea0" />
 
 
                   </ComposedChart>
               </ResponsiveContainer>
-              ) : ("")}
-          </div>
+                  </>) : (
+                      <>
+                    <div width="570px">
+                              <p>please log more workouts to view statistics</p>
+                          </div>
+                  </>)}
+
+          </div> 
           <div className="history-logs">
 
          
