@@ -14,14 +14,9 @@ import User from "./components/user/user.js"
 import Search from "./components/search/search.js"
 import { Auth } from "./components/auth/auth.js"
 
-import { useEffect, useState } from "react";
-
 import {
-  BrowserRouter as Router,
   Route,
-  Routes,
-  Navigate,
-  useLocation,
+  Routes
 } from "react-router-dom";
 
 

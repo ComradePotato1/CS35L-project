@@ -20,7 +20,7 @@ const Profile = () => {
   });
   const [editing, setEditing] = useState(false);
   const [toggleFollower, setToggleFollower] = useState(true) 
-  const profileOptions = ['pic-0', 'pic-1', 'pic-2', 'pic-3'];
+    const profileOptions = ['pic-0', 'pic-1', 'pic-2', 'pic-3', 'pic-4', 'pic-5', 'pic-6', 'pic-7', 'pic-8', 'pic-9', 'pic-10', 'pic-11'];
 
   const [followersList, setFollowersList] = useState([]);
   const [followingList, setFollowingList] = useState([]);
