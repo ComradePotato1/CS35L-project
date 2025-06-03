@@ -29,7 +29,8 @@ const Home = () => {
   const [gender, setGender] = useState("prefer not to say");
   const [loadingRec, setLoadingRec] = useState(false);
   const [workoutPreference, setWorkoutPreference] = useState('');
-
+  const [profile, setProfile] = useState('pic-0');
+  
   useEffect(() => {
     AOS.init({ duration: 2000 });
   }, []);
@@ -147,6 +148,9 @@ const Home = () => {
               }
               if (info.data.rows[0].height!== null) {
                   setHeight(info.data.rows[0].height)
+              }
+              if (info.data.rows[0].profile !== null) {
+                  setProfile(info.data.rows[0].profile)
               }
               setGender(info.data.rows[0].gender)
           } catch (error) {
@@ -271,8 +275,9 @@ const Home = () => {
       </div>
       
       <div className="welcome-section">
-        <img src={icon} alt="workout type" className="home-icon" />
+        <img src={"/images/profile/" + profile + ".png"} alt="Profile" className="home-icon" style={{ borderRadius: '50%' }} />
         <h2>Welcome back, {user}!</h2>
+        <img src={icon} alt="workout type" className="home-icon" />
       </div>
 
       <section className="workout">
