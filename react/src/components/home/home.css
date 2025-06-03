@@ -159,18 +159,23 @@
     display: flex;
     gap: 1rem;
     margin-bottom: 1rem;
+    align-items: stretch;
   }
   
   .div-button {
     background: #4299e1;
     color: white;
-    padding: 0.75rem 1.5rem;
+    padding: 8px 1.5rem;
     border: none;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
     flex: 1;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .div-button:hover {
@@ -220,4 +225,26 @@
     .form button {
       width: 100%;
     }
+  }
+
+  .preference-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    font-family: 'Inter', sans-serif;
+    height: auto;
+    flex: 1;
+  }
+  
+  .preference-input:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+  }
+  
+  .preference-input::placeholder {
+    color: #888;
   }
