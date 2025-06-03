@@ -15,8 +15,8 @@ const UserSearch = () => {
   const navigate = useNavigate();
 
   const getProfileImage = (profileData) => {
-    const profileId = profileData?.profile || '0';
-    return `/images/profile/pic-${profileId}.png`;
+      const profileId = profileData?.profile || '0';
+    return `/images/profile/${profileId}.png`;
   };
 
   const fetchRecommendations = useCallback(async () => {
@@ -56,7 +56,8 @@ const UserSearch = () => {
         })
       );
       
-      setRecommendations(usersWithFollowStatus);
+        setRecommendations(usersWithFollowStatus);
+        setError('');;
     } catch (err) {
       setError(err.response?.data?.error || 'Error fetching recommendations');
     } finally {
@@ -92,7 +93,8 @@ const UserSearch = () => {
             });
             return {
               ...user,
-              isFollowing: followCheck.data.some(u => u.username === user.username && u.isFollowing)
+                isFollowing: followCheck.data.some(u => u.username === user.username && u.isFollowing),
+              profileImage: getProfileImage(user)
             };
           } catch {
             return user;

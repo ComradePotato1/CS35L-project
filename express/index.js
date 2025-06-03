@@ -430,17 +430,23 @@ app.post('/search-user', async (req, res) => {
         const { username } = req.body;
 
         const [rows] = await pool.execute(
-            'SELECT * FROM users WHERE username like ?',
-            [username+'%']
+            'SELECT * FROM users WHERE username like ? OR name like ?',
+            [username+'%', username+'%']
         );
 
         let result = [];
         //change 3 later
-        for (let i = 0; i < 3 && i < rows.length; i++) {
+        for (let i = 0; i < 5 && i < rows.length; i++) {
             result.push({ username: rows[i].username, name:rows[i].name, profile: rows[i].profile });
         }
 
-        res.status(200).json({ result });
+        if (result.length === 0) {
+            res.status(500).json({error: "User not found"})
+        }
+        else {
+            res.status(200).json({ result });
+        }
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
