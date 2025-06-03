@@ -28,6 +28,7 @@ const Home = () => {
   const [age, setAge] = useState(20);
   const [gender, setGender] = useState("prefer not to say");
   const [loadingRec, setLoadingRec] = useState(false);
+  const [workoutPreference, setWorkoutPreference] = useState('');
 
   useEffect(() => {
     AOS.init({ duration: 2000 });
@@ -51,7 +52,7 @@ const Home = () => {
     try {
       setLoadingRec(true);
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-      const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} gender: ${gender} \n` + `Please give me three different workout recommendations based on my recent workouts (JSON below). ` +
+      const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} gender: ${gender} ${workoutPreference ? `preference: ${workoutPreference}` : ''} \n` + `Please give me three different workout recommendations based on my recent workouts (JSON below). ` +
         `Return ONLY a JSON array of objects with keys "activity" (string) and "duration" (number).\n` + JSON.stringify(pastWorkouts);
       const result = await model.generateContent(prompt);
       const response = await result.response;
@@ -94,6 +95,7 @@ const Home = () => {
     try {
       setLoadingRec(true);
       setpromptResponses([]);
+      setWorkoutPreference('');
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
       const prompt = `User weight: ${weight} lbs; height: ${height} in. age: ${age} gender: ${gender}  \n` +
     `Please diversify these workout recommendations by changing their categories (e.g. swap a run for a swim, yoga for a hike, etc). ` +
@@ -358,6 +360,13 @@ const Home = () => {
         <section className="pastworkouts">
           <h3>Recommended Workouts</h3>
           <div className="big-buttons">
+            <input
+              type="text"
+              value={workoutPreference}
+              onChange={e => setWorkoutPreference(e.target.value)}
+              placeholder="Exercise Focus?"
+              className="preference-input"
+            />
             <button className="div-button" onClick={getResponseForGivenPrompt}>
               Generate New Recs
             </button>
