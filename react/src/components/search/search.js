@@ -135,7 +135,9 @@ const UserSearch = () => {
       });
 
 
-      await fetchRecommendations();
+      setTimeout(() => {
+        fetchRecommendations();
+      }, 1000);
       
     } catch (err) {
 
