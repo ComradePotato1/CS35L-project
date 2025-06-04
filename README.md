@@ -1,7 +1,5 @@
 # FitAI
-
-insert image here
-FitAI is a client/server app for anyone interested in fitness and health aimed at simplifying and personalizing the workout/health recording experience to addresses the problem of expensive or hard to use competitors.
+FitAI is an innovative client/server app designed to track, analyze, personalize, and share workouts for users with all levels of knowledge about fitness. 
 
 ## How to run FitAI locally
 
@@ -23,9 +21,9 @@ cd ..
 This sets up dependencies and returns to the project root folder. 
 
 ### Connect to database
-The app uses MySQL Server. To run the server locally, install [MySQL Community Server](https://dev.mysql.com/downloads/mysql/8.4.html) first. 
+The app uses MySQL Server. To run the server locally, first install [MySQL Community Server](https://dev.mysql.com/downloads/mysql/8.4.html). 
 
-Following the setup installer, execute the start the server. 
+Following the setup installer, execute and start the server. 
 
 Then, edit the `.env` file in the express folder if necessary, so that it matches your MySQL server environment. An example `.env` has been provided in the express folder
 ```
@@ -35,7 +33,7 @@ DB_PASSWORD=password
 DB_NAME=project
 PORT=5001
 ```
-Where `DB_HOST=localhost` specifies that the project is running locally, `DB_USER` and `DB_PASSWORD` corresponds to the user and password that you used to setup MySQL Server, `DB_NAME` is an arbitrary name for the database, `PORT` is the port that the front end uses to fetch data from the backend. 
+Where `DB_HOST=localhost` specifies that the project is running locally, `DB_USER` and `DB_PASSWORD` corresponds to the user and password that you used to setup MySQL Server, `DB_NAME` is an arbitrary name for the database, `PORT` is the port that the front end uses to fetch data from the backend and should not be changed. 
 
 ### Run the app
 In the root directory, run:

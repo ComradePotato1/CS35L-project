@@ -427,26 +427,27 @@ app.post('/get-react', async (req, res) => {
 
 app.post('/search-user', async (req, res) => {
     try {
-        const { username } = req.body;
+        const { username, searcher } = req.body; // Add searcher parameter
 
-        const [rows] = await pool.execute(
-            'SELECT * FROM users WHERE username like ? OR name like ?',
-            [username+'%', username+'%']
+        const [users] = await pool.execute(
+            `SELECT 
+                u.username, 
+                u.name, 
+                u.profile,
+                CASE WHEN f.follower IS NOT NULL THEN TRUE ELSE FALSE END AS isFollowing
+             FROM users u
+             LEFT JOIN follow f ON u.username = f.followee AND f.follower = ?
+             WHERE u.username LIKE ?
+             LIMIT 20`,
+            [searcher, `${username}%`]
         );
 
-        let result = [];
-        //change 3 later
-        for (let i = 0; i < 5 && i < rows.length; i++) {
-            result.push({ username: rows[i].username, name:rows[i].name, profile: rows[i].profile });
-        }
-
-        if (result.length === 0) {
-            res.status(500).json({error: "User not found"})
-        }
-        else {
-            res.status(200).json({ result });
-        }
-
+        res.status(200).json({ 
+            result: users.map(user => ({
+                ...user,
+                profileImage: `/images/profile/pic-${user.profile || '0'}.png`
+            }))
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
