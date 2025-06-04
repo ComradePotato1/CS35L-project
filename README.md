@@ -1,6 +1,6 @@
 # FitAI
-insert image here
-FitAI is a client/server app for ... aimed at ... addresses the problem of ...
+FitAI is a client/server app designed to track, analyze, and share workouts for users with zero prior knowledge about fitness. 
+
 
 ## How to run FitAI locally
 

@@ -436,7 +436,7 @@ app.post('/search-user', async (req, res) => {
 
         let result = [];
         //change 3 later
-        for (let i = 0; i < 5 && i < rows.length; i++) {
+        for (let i = 0; i < 4 && i < rows.length; i++) {
             result.push({ username: rows[i].username, name:rows[i].name, profile: rows[i].profile });
         }
 

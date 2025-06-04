@@ -4,6 +4,9 @@ import { AuthContext } from '../auth/auth';
 import { useNavigate } from 'react-router-dom';
 import './search.css';
 
+import AOS from 'aos'
+import 'aos/dist/aos.css';
+
 const UserSearch = () => {
   const { user } = useContext(AuthContext);
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,7 +20,11 @@ const UserSearch = () => {
   const getProfileImage = (profileData) => {
       const profileId = profileData?.profile || '0';
     return `/images/profile/${profileId}.png`;
-  };
+    };
+
+    useEffect(() => {
+        AOS.init({ duration: 2000 });
+    }, []);
 
   const fetchRecommendations = useCallback(async () => {
     if (!user) return;
@@ -57,7 +64,7 @@ const UserSearch = () => {
       );
       
         setRecommendations(usersWithFollowStatus);
-        setError('');;
+        setError('');
     } catch (err) {
       setError(err.response?.data?.error || 'Error fetching recommendations');
     } finally {
@@ -102,7 +109,8 @@ const UserSearch = () => {
         })
       );
       
-      setResults(resultsWithFollowStatus);
+        setResults(resultsWithFollowStatus);
+        setError('');
     } catch (err) {
       setError(err.response?.data?.error || 'Error searching users');
     } finally {
@@ -191,8 +199,8 @@ const UserSearch = () => {
       {error && <div className="error-message">{error}</div>}
 
       <div className="search-results">
-        {(results.length > 0 ? results : recommendations).map((userResult) => (
-          <div key={userResult.username} className="user-card">
+        {(results.length > 0 ? results : recommendations).map((userResult, index) => (
+            <div key={userResult.username} className="user-card" data-aos="fade-up" data-aos-delay={ index*100} >
             <div 
               className="user-info" 
               onClick={() => viewProfile(userResult.username)}

@@ -200,7 +200,11 @@ const Home = () => {
 
   const handleSubmit = async (e) => {
       e.preventDefault();
-      const calories = await calcCalories(duration, activity,post);
+      if (post.length > 255) {
+          alert("Note input cannot exceed 255 characters. ")
+          return;
+      }
+      const calories = await calcCalories(duration, activity, post);
     if (duration <= 0) {
       setError('Duration must be at least 1 minute');
       return;
@@ -334,7 +338,7 @@ const Home = () => {
             <textarea
               value={post}
               onChange={e => setPost(e.target.value)}
-              placeholder="How was your workout?"
+              placeholder="How was your workout? (Max 255 chars)"
               rows="4"
             />
           </div>
