@@ -3,7 +3,7 @@ FitAI is an innovative client/server app designed to track, analyze, personalize
 
 ## How to run FitAI locally
 
-This app requires [Node.js](https://nodejs.org/en). Make sure that [Node.js](https://nodejs.org/en) is installed and npm commands can be run in your terminal/shell. 
+This app requires [Node.js](https://nodejs.org/en). Make sure that [Node.js](https://nodejs.org/en) is installed and `npm` commands can be run in your terminal/shell. 
 
 ### Get the code
 
@@ -25,7 +25,7 @@ The app uses MySQL Server. To run the server locally, first install [MySQL Commu
 
 Following the setup installer, execute and start the server. 
 
-Then, edit the `.env` file in the express folder if necessary, so that it matches your MySQL server environment. An example `.env` has been provided in the express folder
+Then, edit the `.env` file in `/express` if necessary, so that it matches your MySQL server environment. An example `.env` has been provided in the express folder
 ```
 DB_HOST=localhost
 DB_USER=root
@@ -42,6 +42,15 @@ npm start
 ```
 
 This starts both the front end and the backend, and creates the necessary database in the MySQL Server. Once the deployment server starts, the app should open on your browser. You need to create an account to use the app. 
+
+### Importing entries for testing
+Normally, users input entries and program states is updated automatically. 
+To test the program, we recommend importing some user data to explore the full functionality of the program. 
+- After running the program at least once to generate tables, in the root folder, you will find the `TestCase.sql` file. This contains the MySQL statements with LLM generated testing data. 
+- You can open the file in MySQL Workbench or directly execute the statements in MySQL CLI server. 
+- Then navigate to `http://localhost:3000/testing/refresh-stats` or a similar URL in your browser, this will execute a full refresh of user statistics. 
+- After this, all users and statistics will display correctly. 
+
 
 ## Technologies
 - React
