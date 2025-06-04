@@ -444,8 +444,9 @@ app.post('/get-react', async (req, res) => {
 
 app.post('/search-user', async (req, res) => {
     try {
-        const { username, searcher } = req.body; // Add searcher parameter
+        const { searchTerm, searcher } = req.body; // Changed from 'username' to 'searchTerm'
 
+        // Search for users matching either username or name, with follow status
         const [users] = await pool.execute(
             `SELECT 
                 u.username, 
@@ -454,19 +455,44 @@ app.post('/search-user', async (req, res) => {
                 CASE WHEN f.follower IS NOT NULL THEN TRUE ELSE FALSE END AS isFollowing
              FROM users u
              LEFT JOIN follow f ON u.username = f.followee AND f.follower = ?
-             WHERE u.username LIKE ?
-             LIMIT 20`,
-            [searcher, `${username}%`]
+             WHERE 
+                u.username LIKE ? OR 
+                u.name LIKE ? OR
+                CONCAT(u.name, ' ', u.username) LIKE ?
+             ORDER BY 
+                CASE 
+                    WHEN u.username LIKE ? THEN 0  # Exact username match first
+                    WHEN u.name LIKE ? THEN 1      # Exact name match next
+                    ELSE 2                         # Partial matches last
+                END
+             LIMIT 5`,
+            [
+                searcher,
+                `${searchTerm}%`,      // Username starts with
+                `${searchTerm}%`,      // Name starts with
+                `%${searchTerm}%`,     // Combined name + username contains
+                `${searchTerm}%`,      // For ordering
+                `${searchTerm}%`       // For ordering
+            ]
         );
 
-        res.status(200).json({ 
-            result: users.map(user => ({
-                ...user,
-                profileImage: `/images/profile/pic-${user.profile || '0'}.png`
-            }))
-        });
+        if (users.length === 0) {
+            return res.status(404).json({ error: "No users found" });
+        }
+
+        const result = users.map(user => ({
+            ...user,
+            profileImage: `/images/profile/pic-${user.profile || '0'}.png`,
+            isFollowing: Boolean(user.isFollowing)
+        }));
+
+        res.status(200).json({ result });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Search error:', error);
+        res.status(500).json({ 
+            error: 'Error searching users',
+            details: error.message
+        });
     }
 });
 

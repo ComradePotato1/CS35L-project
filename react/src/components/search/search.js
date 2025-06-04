@@ -87,7 +87,7 @@ const UserSearch = () => {
     try {
       setLoading(true);
       const response = await axios.post('http://localhost:5001/search-user', {
-        username: searchTerm,
+        searchTerm: searchTerm,
         searcher: user 
       });
   
