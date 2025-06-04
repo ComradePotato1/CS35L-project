@@ -10,39 +10,52 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const connect = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    waitForConnections: true,
-});
+const initializeDatabase = async () => {
+    const connect = mysql.createPool({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        waitForConnections: true,
+    });
 
-connect.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`);
+    try {
+        await connect.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`);
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-});
+        const pool = mysql.createPool({
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME,
+            waitForConnections: true,
+        });
+
+        await pool.query(`USE ${process.env.DB_NAME}`);
+        await pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), profile VARCHAR(255) DEFAULT 'pic-0', weight SMALLINT(15), height SMALLINT(15), age SMALLINT(15), social BOOLEAN DEFAULT TRUE, gender VARCHAR(255) DEFAULT 'prefer not to say' )");
+        await pool.query("CREATE TABLE IF NOT EXISTS stats ( username VARCHAR (255), aerobic SMALLINT(15) DEFAULT 0, stretching SMALLINT(15) DEFAULT 0 , strengthening SMALLINT(15) DEFAULT 0, balance SMALLINT(15) DEFAULT 0, rest SMALLINT(15) DEFAULT 0 , other SMALLINT(15) DEFAULT 0 )");
+        await pool.query(`CREATE TABLE IF NOT EXISTS log (log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME, duration INT, post VARCHAR(255), calories INT)`);
+        await pool.query("CREATE TABLE IF NOT EXISTS react ( log_id INT, username VARCHAR(255) )");
+        await pool.query("CREATE TABLE IF NOT EXISTS follow ( follower VARCHAR(255) , followee VARCHAR(255) )");
+
+        return pool;
+    } catch (error) {
+        throw error;
+    } finally {
+        await connect.end();
+    }
+};
 
 const workoutCategories = {
     rest: ['rest', 'recovery', 'nap', 'sleep', 'relax', 'meditation', 'day off', 'chill', 'rest day'],
-    aerobic: ['run', 'ran', 'sprint', 'jog', 'cycle', 'swim', 'row', 'dance', 'aerobics', 'cardio', 'hiit', 'kickbox', 'zumba', 'elliptical', 'spin', 'cycling', 'jumping rope', 'boxing', 'martial arts', 'hiking','ball', 'soccer', ],
+    aerobic: ['run', 'ran', 'sprint', 'jog', 'cycle', 'swim', 'row', 'dance', 'aerobics', 'cardio', 'hiit', 'kickbox', 'zumba', 'elliptical', 'spin', 'cycling', 'jumping rope', 'boxing', 'martial arts', 'hiking','ball', 'soccer', 'walk'],
     strengthening: ['strength', 'lift', 'weight', 'resistance', 'crossfit', 'powerlift', 'calisthen', 'plyo', 'muscle', 'bench', 'deadlift', 'squat', 'pull-up', 'push-up', 'dip', 'kettlebell', 'barbell', 'dumbbell', 'bodyweight', 'chin-up', 'press', 'clean', 'snatch'],
     balance: ['yoga', 'tai chi', 'balance', 'stability', 'pilates', 'proprioception', 'vinyasa', 'hatha', 'yin', 'ashtanga', 'iyengar', 'kundalini', 'acro yoga', 'balance board', 'slackline'],
     stretching: ['stretch', 'flexibility', 'limber', 'mobility', 'cool down', 'warm up', 'static', 'dynamic', 'hamstring', 'quad', 'shoulder', 'hip flexor', 'psoas', 'foam roll', 'myofascial', 'lunge', 'twist', 'extension'],
     other: [] 
 };
 
-pool.query(`USE ${process.env.DB_NAME}`);
-pool.query("CREATE TABLE IF NOT EXISTS users ( user_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), password VARCHAR(255), name VARCHAR(255), profile VARCHAR(255) DEFAULT 'pic-0', weight SMALLINT(15), height SMALLINT(15), age SMALLINT(15), social BOOLEAN DEFAULT TRUE, gender VARCHAR(255) DEFAULT 'prefer not to say' )");
-pool.query("CREATE TABLE IF NOT EXISTS stats ( username VARCHAR (255), aerobic SMALLINT(15) DEFAULT 0, stretching SMALLINT(15) DEFAULT 0 , strengthening SMALLINT(15) DEFAULT 0, balance SMALLINT(15) DEFAULT 0, rest SMALLINT(15) DEFAULT 0 , other SMALLINT(15) DEFAULT 0 )");
-pool.query(`CREATE TABLE IF NOT EXISTS log (log_id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255), activity VARCHAR(255), timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, day DATE, start TIME, duration INT, post VARCHAR(255), calories INT)`); 
-pool.query("CREATE TABLE IF NOT EXISTS react ( log_id INT, username VARCHAR(255) )");
-pool.query("CREATE TABLE IF NOT EXISTS follow ( follower VARCHAR(255) , followee VARCHAR(255) )");
 
+initializeDatabase()
+    .then(pool => {
 app.get('/test', async (req, res) => {
     res.status(200).json({ message: 'test success' });
 })
@@ -665,7 +678,9 @@ app.post('/delete-log', async (req, res) => {
         });
     }
 });
-
-
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+        const PORT = process.env.PORT || 5001;
+        app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    })
+    .catch(err => {
+        console.error("Failed to initialize database:");
+    });
