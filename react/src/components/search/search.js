@@ -76,33 +76,22 @@ const UserSearch = () => {
       setResults([]);
       return;
     }
-
+  
     try {
       setLoading(true);
       const response = await axios.post('http://localhost:5001/search-user', {
-        username: searchTerm
+        username: searchTerm,
+        searcher: user 
       });
-      
+  
 
-      const resultsWithFollowStatus = await Promise.all(
-        response.data.result.map(async (user) => {
-          try {
-            const followCheck = await axios.post('http://localhost:5001/api/search-users', {
-              q: user.username,
-              searcher: user
-            });
-            return {
-              ...user,
-                isFollowing: followCheck.data.some(u => u.username === user.username && u.isFollowing),
-              profileImage: getProfileImage(user)
-            };
-          } catch {
-            return user;
-          }
-        })
-      );
-      
-      setResults(resultsWithFollowStatus);
+      const formattedResults = response.data.result.map(user => ({
+        ...user,
+        profileImage: getProfileImage(user)
+      }));
+  
+      setResults(formattedResults);
+      setError('');
     } catch (err) {
       setError(err.response?.data?.error || 'Error searching users');
     } finally {
