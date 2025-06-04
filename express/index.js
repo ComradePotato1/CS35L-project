@@ -66,6 +66,10 @@ app.post('/register', async (req, res) => {
         const profile = "pic-0"
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        if (!username.length || !password.length) {
+            return res.status(401).json({ error: 'Invalid username or password' });
+        }
+
         const [rows] = await pool.execute(
             'SELECT * FROM users WHERE username = ?',
             [username]

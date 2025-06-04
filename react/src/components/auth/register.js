@@ -13,6 +13,7 @@ const Register = () => {
     const profile = "pic-0";
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
+    const [popupMsg, setPopupMsg] = useState('')
 
     useEffect(() => {
         if (user) {
@@ -26,22 +27,27 @@ const Register = () => {
         e.preventDefault();
         try {
             await axios.post('http://localhost:5001/register', { username, password, profile });
+            setPopupMsg('New user created! Redirecting...');
             const popup = document.getElementById('popup');
             popup.style.display = "flex";
-            await delay(2500);
+            await delay(2000);
             navigate("/login") 
             
                 
 
         } catch (error) {
-            alert(error.response?.data?.error || 'Registration failed');
+            setPopupMsg(error.response?.data?.error || 'Registration failed');
+            const popup = document.getElementById('popup');
+            popup.style.display = "flex";
+            await delay(5000);
+            popup.style.display = "none";
         }
     };
 
     return (
         <div className="login-background">
             <div className="login-page">
-                <div class="popup" id="popup"><span class="popuptext">New user created! Redirecting</span></div>
+                <div class="popup" id="popup"><span class="popuptext">{popupMsg}</span></div>
                 <div style={{ height: "10vh" }} />
                 <div className="login-text">
                     Register
