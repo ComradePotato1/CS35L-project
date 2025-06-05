@@ -33,7 +33,8 @@ DB_PASSWORD=password
 DB_NAME=project
 PORT=5001
 ```
-Where `DB_HOST=localhost` specifies that the project is running locally, `DB_USER` and `DB_PASSWORD` corresponds to the user and password that you used to setup MySQL Server, `DB_NAME` is an arbitrary name for the database, `PORT` is the port that the front end uses to fetch data from the backend and is hardcoded. In particular, this server uses Port 5001. If there is a collision, one would have to change all calls to axios.
+Where `DB_HOST=localhost` specifies that the project is running locally, `DB_USER` and `DB_PASSWORD` corresponds to the user and password that you used to setup MySQL Server, `DB_NAME` is an arbitrary name for the database, 
+`PORT` is hard-coded into front end to fetch data from the backend, and it should not be changed. The backend server listens on Port 5001. If there is a collision, one would have to change all calls to localhost:5001.
 
 ### Run the app
 In the root directory, run:
@@ -41,8 +42,10 @@ In the root directory, run:
 npm start
 ```
 
-This starts both the front end and the backend, the backend will automatically create the necessary tables upon first run if the database (project) already exists. If not, create in manually using:
-    CREATE DATABASE project;
+This starts both the front end and the backend, the backend will automatically create the necessary database and tables. In case the database initialization fails, you can manually create the database via the SQL command:
+```
+CREATE DATABASE project;
+```
 Once the deployment server starts, the app should open on your browser. You need to create an account to use the app. 
 
 ### Importing entries for testing
