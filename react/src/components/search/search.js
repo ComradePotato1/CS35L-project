@@ -169,7 +169,7 @@ const UserSearch = () => {
   };
 
   const UserResultCard = ({ userResult, index, viewProfile, handleFollow, currentUser, refreshing, isRecommended }) => (
-    <div className="user-card" data-aos="fade-up" data-aos-delay={index * 100}>
+    <div className="user-card">
       {isRecommended && <span className="recommended-badge">Recommended</span>}
       
       <div 
@@ -188,7 +188,7 @@ const UserSearch = () => {
         />
         <div className="user-details">
           <h3>{userResult.username}</h3>
-          <p>{userResult.name || 'No name provided'}</p>
+          <p>{userResult.name || ''}</p>
         </div>
       </div>
       
@@ -231,12 +231,13 @@ const UserSearch = () => {
   
       {error && <div className="error-message">{error}</div>}
   
-      <div className="search-results">
+      <div className="search-results" >
         {/* Show search results section if there are results */}
         {results.length > 0 && (
           <>
             <h3 className="results-section-title">Search Results</h3>
-            {results.map((userResult, index) => (
+                      {results.map((userResult, index) => (
+                <span data-aos="fade-up" data-aos-delay={index * 100}>
               <UserResultCard 
                 key={userResult.username}
                 userResult={userResult}
@@ -244,8 +245,9 @@ const UserSearch = () => {
                 viewProfile={viewProfile}
                 handleFollow={handleFollow}
                 currentUser={user}
-                refreshing={refreshing}
-              />
+                    refreshing={refreshing}
+                              />
+                          </span>
             ))}
           </>
         )}
