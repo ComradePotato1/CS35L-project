@@ -81,6 +81,7 @@ const UserSearch = () => {
     e.preventDefault();
     if (!searchTerm.trim()) {
       setResults([]);
+      setError('');
       return;
     }
   
@@ -91,14 +92,19 @@ const UserSearch = () => {
         searcher: user 
       });
   
-      const formattedResults = response.data.result.map(user => ({
-        ...user,
-        profileImage: getProfileImage(user)
-      }));
-  
-      setResults(formattedResults);
-      setError('');
+      if (response.data.result && response.data.result.length > 0) {
+        const formattedResults = response.data.result.map(user => ({
+          ...user,
+          profileImage: getProfileImage(user)
+        }));
+        setResults(formattedResults);
+        setError('');
+      } else {
+        setResults([]);
+        setError('No users found');
+      }
     } catch (err) {
+      setResults([]); 
       setError(err.response?.data?.error || 'Error searching users');
     } finally {
       setLoading(false);
