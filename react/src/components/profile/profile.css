@@ -231,14 +231,14 @@
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   display: none;
-  margin-left: 37%;
+  margin-left: 38%;
   align-items: center;
   justify-content: center;
   animation: slideIn 0.3s ease-out;
   z-index: 1000;
   font-family: 'Poppins', sans-serif;
   box-shadow: 0 4px 6px rgba(56, 161, 105, 0.2);
-  max-width: 300px;
+  max-width: 20%;
   font-size: 0.95rem;
   text-align: center;
   
