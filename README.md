@@ -23,7 +23,7 @@ This sets up dependencies and returns to the project root folder.
 ### Connect to database
 The app uses MySQL Server. To run the server locally, first install [MySQL Community Server](https://dev.mysql.com/downloads/mysql/8.4.html). 
 
-Following the setup installer, execute and start the server. 
+After completing the installer, start the MySQL server. 
 
 Then, edit the `.env` file in `/express` if necessary, so that it matches your MySQL server environment. An example `.env` has been provided in the express folder
 ```
@@ -41,10 +41,12 @@ In the root directory, run:
 npm start
 ```
 
-This starts both the front end and the backend, and creates the necessary database in the MySQL Server. Once the deployment server starts, the app should open on your browser. You need to create an account to use the app. 
+This starts both the front end and the backend, the backend will automatically create the necessary tables upon first run if the database (project) already exists. If not, create in manually using:
+    CREATE DATABASE project;
+Once the deployment server starts, the app should open on your browser. You need to create an account to use the app. 
 
 ### Importing entries for testing
-Normally, users input entries and program states is updated automatically. 
+Normally, users enter data manually and the application updates its state automatically. 
 To test the program, we recommend importing some user data to explore the full functionality of the program. 
 - After running the program at least once to generate tables, in the root folder, you will find the `TestCase.sql` file. This contains the MySQL statements with LLM generated testing data. 
 - You can open the file in MySQL Workbench or directly execute the statements in MySQL CLI server. 
