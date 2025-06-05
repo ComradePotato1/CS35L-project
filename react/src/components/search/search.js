@@ -168,6 +168,46 @@ const UserSearch = () => {
     navigate(`/user/${username}`);
   };
 
+  const UserResultCard = ({ userResult, index, viewProfile, handleFollow, currentUser, refreshing, isRecommended }) => (
+    <div className="user-card" data-aos="fade-up" data-aos-delay={index * 100}>
+      {isRecommended && <span className="recommended-badge">Recommended</span>}
+      
+      <div 
+        className="user-info" 
+        onClick={() => viewProfile(userResult.username)}
+        style={{ cursor: 'pointer' }} 
+      >
+        <img 
+          src={userResult.profileImage || '/images/profile/pic-0.png'} 
+          alt={userResult.username}
+          className="user-avatar"
+          onError={(e) => {
+            e.target.onerror = null; 
+            e.target.src = '/images/profile/pic-0.png';
+          }}
+        />
+        <div className="user-details">
+          <h3>{userResult.username}</h3>
+          <p>{userResult.name || 'No name provided'}</p>
+        </div>
+      </div>
+      
+      {userResult.username !== currentUser && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); 
+            handleFollow(userResult.username, userResult.isFollowing);
+          }}
+          className={`follow-button ${userResult.isFollowing ? 'following' : ''}`}
+          disabled={refreshing}
+        >
+          {refreshing && userResult.isFollowing ? 'Updating...' : 
+           userResult.isFollowing ? 'Following' : 'Follow'}
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <div className="user-search-container">
       <h2>Search Users</h2>
@@ -177,7 +217,7 @@ const UserSearch = () => {
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search by username..."
+          placeholder="Search by username or name..."
           className="search-input"
         />
         <button 
@@ -188,47 +228,47 @@ const UserSearch = () => {
           {loading ? 'Searching...' : 'Search'}
         </button>
       </form>
-
+  
       {error && <div className="error-message">{error}</div>}
-
+  
       <div className="search-results">
-        {(results.length > 0 ? results : recommendations).map((userResult, index) => (
-            <div key={userResult.username} className="user-card" data-aos="fade-up" data-aos-delay={ index*100} >
-            <div 
-              className="user-info" 
-              onClick={() => viewProfile(userResult.username)}
-              style={{ cursor: 'pointer' }} 
-            >
-              <img 
-                src={userResult.profileImage || '/images/profile/pic-0.png'} 
-                alt={userResult.username}
-                className="user-avatar"
-                onError={(e) => {
-                  e.target.onerror = null; 
-                  e.target.src = '/images/profile/pic-0.png';
-                }}
+        {/* Show search results section if there are results */}
+        {results.length > 0 && (
+          <>
+            <h3 className="results-section-title">Search Results</h3>
+            {results.map((userResult, index) => (
+              <UserResultCard 
+                key={userResult.username}
+                userResult={userResult}
+                index={index}
+                viewProfile={viewProfile}
+                handleFollow={handleFollow}
+                currentUser={user}
+                refreshing={refreshing}
               />
-              <div>
-                <h3>{userResult.username}</h3>
-                <p>{userResult.name || 'No name provided'}</p>
-              </div>
-            </div>
-            {userResult.username !== user && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation(); 
-                  handleFollow(userResult.username, userResult.isFollowing);
-                }}
-                className={`follow-button ${userResult.isFollowing ? 'following' : ''}`}
-                disabled={refreshing}
-              >
-                {refreshing && userResult.isFollowing ? 'Updating...' : 
-                 userResult.isFollowing ? 'Following' : 'Follow'}
-              </button>
-            )}
-          </div>
-        ))}
-        
+            ))}
+          </>
+        )}
+  
+        {/* Show recommendations section if no search results */}
+        {results.length === 0 && recommendations.length > 0 && (
+          <>
+            <h3 className="results-section-title">Recommended Users</h3>
+            {recommendations.map((userResult, index) => (
+              <UserResultCard 
+                key={userResult.username}
+                userResult={userResult}
+                index={index}
+                viewProfile={viewProfile}
+                handleFollow={handleFollow}
+                currentUser={user}
+                refreshing={refreshing}
+                isRecommended={true}
+              />
+            ))}
+          </>
+        )}
+  
         {refreshing && <div className="loading-message">Refreshing recommendations...</div>}
         
         {!refreshing && results.length === 0 && recommendations.length === 0 && (

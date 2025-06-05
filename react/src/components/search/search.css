@@ -168,6 +168,45 @@
     background-color: #e0e0e0;
     color: #333;
   }
+
+  .results-section-title {
+    color: #666;
+    margin: 20px 0 10px;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  
+  .recommended-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #4499cc;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    z-index: 1;
+  }
+  
+  .user-card {
+    position: relative;
+    margin-bottom: 15px;
+  }
+  
+  .user-details {
+    margin-left: 15px;
+  }
+  
+  .user-details h3 {
+    margin: 0 0 5px 0;
+  }
+  
+  .user-details p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
   
   @media (max-width: 768px) {
     .search-form {
