@@ -172,7 +172,7 @@ const User = () => {
                     const response = await result.response;
                     setStyle(response.text());
                 } catch (error) {
-                    alert("error");
+                    setStyle("Unable to generate workout style. Please try again later. ");
                 }
             }
         }

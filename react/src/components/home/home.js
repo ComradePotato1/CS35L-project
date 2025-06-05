@@ -45,7 +45,7 @@ const Home = () => {
       const response = await result.response;
       return parseInt(response.text());
     } catch (error) {
-      alert("generate calorie error");
+      alert("Unable to generate calories estimates. Please try again later");
     }
   }
 
