@@ -18,7 +18,7 @@ const User = () => {
     const [data, setData] = useState([]);
     const [style, setStyle] = useState("Loading...");
 
-    const genAI = new GoogleGenerativeAI("AIzaSyCjKRjNSU9UwkgtpIb0reNGjbmotkh7Xs8");
+    const genAI = new GoogleGenerativeAI("api_key_placeholder");
 
     const [info, setInfo] = useState({
         username: '',

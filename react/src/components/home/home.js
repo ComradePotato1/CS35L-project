@@ -35,7 +35,7 @@ const Home = () => {
     AOS.init({ duration: 2000 });
   }, []);
 
-  const genAI = new GoogleGenerativeAI("AIzaSyCjKRjNSU9UwkgtpIb0reNGjbmotkh7Xs8");
+  const genAI = new GoogleGenerativeAI("api_key_placeholder");
 
   const calcCalories = async (timespent, activity, post) => {
     try {
